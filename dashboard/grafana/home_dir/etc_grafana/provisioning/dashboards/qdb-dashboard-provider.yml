@@ -1,0 +1,10 @@
+apiVersion: 1
+
+providers:
+  - name: 'questdb sample dashboards'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 1000
+    options:
+      path: /var/lib/grafana/dashboards
+

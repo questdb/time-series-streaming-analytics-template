@@ -1,0 +1,102 @@
+version: "3.9"
+
+services:
+  questdb:
+    image: questdb/questdb
+    container_name: questdb_quickstart
+    restart: always
+    ports:
+      - "18812:8812"
+      - "19000:9000"
+      - "19009:9009"
+      - "19003:9003"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  grafana:
+    image: grafana/grafana-oss
+    container_name: questdb_quickstart_grafana
+    restart: always
+    user: "${DOCKER_COMPOSE_USER_ID:-}"
+    ports:
+      - 13000:3000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./dashboard/grafana/home_dir/var_lib_grafana:/var/lib/grafana/
+      - ./dashboard/grafana/home_dir/etc_grafana:/etc/grafana/
+    environment:
+      - QDB_CLIENT_PG_HOST=${QDB_CLIENT_PG_HOST:-host.docker.internal}
+      - QDB_CLIENT_PG_PORT=${QDB_CLIENT_PG_PORT:-18812}
+      - QDB_CLIENT_PG_USER=${QDB_CLIENT_PG_USER:-admin}
+      - QDB_CLIENT_PG_PASSWORD=${QDB_CLIENT_PG_PASSWORD:-quest}
+      # use the value "disable" for local installations, and "require" for QuestDB Cloud
+      - QDB_SSL_PG_MODE=${QDB_SSL_PG_MODE:-disable}
+
+  jupyter-notebook:
+    image:    jupyter/scipy-notebook
+    volumes:
+      - ./notebooks:/home/jovyan
+    ports:
+      - 8888:8888
+    container_name:   jupyter_notebook
+    command: sh -c "pip install questdb psycopg[binary] && start-notebook.sh --NotebookApp.password= --NotebookApp.token=" 
+    depends_on:
+      - questdb
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - RESTARTABLE=yes
+
+  broker:
+    image: confluentinc/cp-kafka:latest
+    hostname: broker
+    container_name: broker
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@broker:29093'
+      KAFKA_LISTENERS: 'PLAINTEXT://broker:29092,CONTROLLER://broker:29093,PLAINTEXT_HOST://0.0.0.0:9092'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+      # Replace CLUSTER_ID with a unique base64 UUID using "bin/kafka-storage.sh random-uuid" 
+      # See https://docs.confluent.io/kafka/operations-tools/kafka-tools.html#kafka-storage-sh
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+
+  kafka-connect:
+    image: confluentinc/cp-kafka-connect:latest
+    depends_on:
+      - broker
+    ports:
+      - "8083:8083"
+    volumes:
+      - ./kafka-connect-plugins:/usr/share/java # Mount local directory for plugins
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: broker:9092
+      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect
+      CONNECT_REST_PORT: 8083
+      CONNECT_GROUP_ID: kafka-connect
+      CONNECT_CONFIG_STORAGE_TOPIC: kafka-connect-configs
+      CONNECT_OFFSET_STORAGE_TOPIC: kafka-connect-offsets
+      CONNECT_STATUS_STORAGE_TOPIC: kafka-connect-status
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE: "false"
+      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+      CONNECT_PLUGIN_PATH: "/usr/share/java"
+
