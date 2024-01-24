@@ -3,7 +3,7 @@ version: "3.9"
 services:
   questdb:
     image: questdb/questdb
-    container_name: questdb_quickstart
+    container_name: rta_questdb
     restart: always
     ports:
       - "18812:8812"
@@ -15,7 +15,7 @@ services:
 
   grafana:
     image: grafana/grafana-oss
-    container_name: questdb_quickstart_grafana
+    container_name: rta_grafana
     restart: always
     user: "${DOCKER_COMPOSE_USER_ID:-}"
     ports:
@@ -35,11 +35,11 @@ services:
 
   jupyter-notebook:
     image:    jupyter/scipy-notebook
+    container_name: rta_jupyter
     volumes:
       - ./notebooks:/home/jovyan
     ports:
       - 8888:8888
-    container_name:   jupyter_notebook
     command: sh -c "pip install questdb psycopg[binary] && start-notebook.sh --NotebookApp.password= --NotebookApp.token=" 
     depends_on:
       - questdb
@@ -49,12 +49,14 @@ services:
       - RESTARTABLE=yes
 
   broker:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:7.5.3
     hostname: broker
-    container_name: broker
+    container_name: rta_kafka_broker
     ports:
       - "9092:9092"
       - "9101:9101"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
@@ -73,30 +75,71 @@ services:
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
       # Replace CLUSTER_ID with a unique base64 UUID using "bin/kafka-storage.sh random-uuid" 
       # See https://docs.confluent.io/kafka/operations-tools/kafka-tools.html#kafka-storage-sh
-      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+      CLUSTER_ID: 'QTkwRDkzMDg3QTdFNDJCRU'
 
   kafka-connect:
-    image: confluentinc/cp-kafka-connect:latest
+    image: confluentinc/cp-kafka-connect:7.5.3
+    hostname: kafka-connect
+    container_name: rta_kafka_connect
     depends_on:
       - broker
     ports:
       - "8083:8083"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
-      - ./kafka-connect-plugins:/usr/share/java # Mount local directory for plugins
+      - ./kafka-connect-plugins:/etc/kafka-connect/jars # Mount local directory for plugins
     environment:
-      CONNECT_BOOTSTRAP_SERVERS: broker:9092
-      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect
-      CONNECT_REST_PORT: 8083
-      CONNECT_GROUP_ID: kafka-connect
-      CONNECT_CONFIG_STORAGE_TOPIC: kafka-connect-configs
-      CONNECT_OFFSET_STORAGE_TOPIC: kafka-connect-offsets
-      CONNECT_STATUS_STORAGE_TOPIC: kafka-connect-status
+      CONNECT_BOOTSTRAP_SERVERS: 'broker:29092'
+      CONNECT_REST_ADVERTISED_HOST_NAME: connect
+      CONNECT_GROUP_ID: compose-connect-group
+      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
       CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
+      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE: "false"
-      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
-      CONNECT_PLUGIN_PATH: "/usr/share/java"
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      # CLASSPATH required due to CC-2422
+      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-7.5.3-0.jar
+      CONNECT_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
+      CONNECT_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
+      CONNECT_PLUGIN_PATH: "/usr/share/java,/etc/kafka-connect/jars,/usr/share/confluent-hub-components"
+    command:
+    - bash
+    - -c
+    - |
+      # Launch Kafka Connect
+      /etc/confluent/docker/run &
+      #
+      # Wait for Kafka Connect listener
+      echo "Waiting for Kafka Connect to start listening on localhost ⏳"
+      while : ; do
+        curl_status=$$(curl -s -o /dev/null -w %{http_code} http://localhost:8083/connectors)
+        echo -e $$(date) " Kafka Connect listener HTTP state: " $$curl_status " (waiting for 200)"
+        if [ $$curl_status -eq 200 ] ; then
+          break
+        fi
+        sleep 5 
+      done
+
+      echo -e "\n--\n+> Registering QuestDB Connector"
+
+      curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/questdb-ilp/config -d '{
+      "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
+          "topics": "ilpTest",
+          "host": "questdb:9009",
+          "name": "questdb-ilp",
+          "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+          "include.key": false,
+          "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+          "table": "ilp_test",
+          "symbols": "device_type",
+          "value.converter.schemas.enable": false
+      }'
+
+      sleep infinity
 
