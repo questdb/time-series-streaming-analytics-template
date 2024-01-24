@@ -7,6 +7,7 @@
 # Jupyter notebook
 
 .cache/*
+notebooks/.jupyter/*
 notebooks/.ipython/*
 notebooks/.cache/*
 notebooks/.local/*

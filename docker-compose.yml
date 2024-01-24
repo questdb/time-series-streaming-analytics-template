@@ -47,6 +47,7 @@ services:
       - "host.docker.internal:host-gateway"
     environment:
       - RESTARTABLE=yes
+      - DOCKER_STACKS_JUPYTER_CMD=notebook
 
   broker:
     image: confluentinc/cp-kafka:7.5.3
