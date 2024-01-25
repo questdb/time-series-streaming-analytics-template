@@ -12,6 +12,8 @@ services:
       - "19003:9003"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    environment:
+      - QDB_METRICS_ENABLED=TRUE
 
   grafana:
     image: grafana/grafana-oss
