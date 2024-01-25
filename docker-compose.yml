@@ -58,9 +58,13 @@ services:
     ports:
       - "9092:9092"
       - "9101:9101"
+      - "8778:8778"   #Jolokia agent for MX monitoring metrics
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    volumes:
+      - ./monitoring/kafka-agent:/usr/jolokia/agents:ro   #Jolokia agent for MX monitoring metrics
     environment:
+      KAFKA_OPTS: -javaagent:/usr/jolokia/agents/jolokia-jvm-1.7.2.jar=host=0.0.0.0    #Jolokia agent for MX monitoring metrics
       KAFKA_NODE_ID: 1
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
       KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092'
@@ -153,6 +157,6 @@ services:
       - questdb
       - broker
     volumes:
-      - ./monitoring/kafka_and_questdb_telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ./monitoring/telegraf/kafka_and_questdb_telegraf.conf:/etc/telegraf/telegraf.conf:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
