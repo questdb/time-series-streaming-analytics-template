@@ -146,3 +146,13 @@ services:
 
       sleep infinity
 
+  telegraf:
+    image: telegraf
+    container_name: rta_telegraf
+    depends_on:
+      - questdb
+      - broker
+    volumes:
+      - ./monitoring/kafka_and_questdb_telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
