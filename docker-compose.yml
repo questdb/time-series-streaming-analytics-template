@@ -148,6 +148,19 @@ services:
           "value.converter.schemas.enable": false
       }'
 
+      curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/questdb-github/config -d '{
+      "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
+          "topics": "github_events",
+          "host": "questdb:9009",
+          "name": "questdb-github",
+          "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+          "include.key": false,
+          "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+          "table": "github_events",
+          "symbols": "type,repo",
+          "timestamp.field.name": "created_at",
+          "value.converter.schemas.enable": false
+      }'
       sleep infinity
 
   telegraf:
