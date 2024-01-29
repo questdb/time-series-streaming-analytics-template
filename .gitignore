@@ -36,6 +36,8 @@ hs_err_pid*
 
 __debug_bin
 go.sum
+# go binary
+ingestion/go/github_events/github_events
 
 .DS_Store
 .idea

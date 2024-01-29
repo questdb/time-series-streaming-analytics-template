@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"time"
-        "encoding/json" 
 
 	"github.com/IBM/sarama"
 	"github.com/google/go-github/v32/github"
@@ -13,13 +14,18 @@ import (
 )
 
 const (
-	githubToken   = "TOKEN" // Replace with your GitHub token
 	kafkaTopic    = "github_events"     // Kafka topic to produce messages to
 	kafkaBroker   = "localhost:9092"    // Kafka broker address
 	fetchInterval = 10 * time.Second    // Time interval between fetches
 )
 
 func main() {
+	// Fetch GitHub token from environment variable
+	githubToken := os.Getenv("GITHUB_TOKEN")
+	if githubToken == "" {
+		log.Fatalf("GitHub token not found in environment variables.")
+	}
+
 	ctx := context.Background()
 
 	// GitHub client setup
@@ -47,15 +53,17 @@ func main() {
 		}
 
 		for _, event := range events {
-			// Convert created_at to epoch in microseconds
-			createdAt := event.GetCreatedAt()
-			createdAtMicro := createdAt.UnixNano() / 1000
+			// Uncomment the following lines if you want to send the event timestamp 
+			// rather than allow QuestDB to use the server timestamp
+			// createdAt := event.GetCreatedAt()
+			// createdAtMicro := createdAt.UnixNano() / 1000
 
 			eventData := map[string]interface{}{
-				"type":                    event.GetType(),
-				"repo":                    event.GetRepo().GetName(),
-				"actor":                   event.GetActor().GetLogin(),
-				"created_at_microseconds": createdAtMicro,
+				"type":  event.GetType(),
+				"repo":  event.GetRepo().GetName(),
+				"actor": event.GetActor().GetLogin(),
+				// Uncomment the following line if using createdAtMicro
+				// "created_at_microseconds": createdAtMicro,
 			}
 
 			data, err := json.Marshal(eventData)
@@ -76,7 +84,6 @@ func main() {
 				fmt.Printf("Message sent to partition %d at offset %d\n", partition, offset)
 			}
 		}
-
 		time.Sleep(fetchInterval)
 	}
 }
