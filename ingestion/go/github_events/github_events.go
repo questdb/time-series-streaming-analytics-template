@@ -63,7 +63,7 @@ func main() {
 				"repo":  event.GetRepo().GetName(),
 				"actor": event.GetActor().GetLogin(),
 				// Uncomment the following line if using createdAtMicro
-				// "created_at_microseconds": createdAtMicro,
+				// "created_at": createdAtMicro,
 			}
 
 			data, err := json.Marshal(eventData)

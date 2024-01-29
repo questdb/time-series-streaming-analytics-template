@@ -38,7 +38,7 @@ public class GitHubKafkaProducer {
                     String message = String.format("{\"type\": \"%s\", \"repo\": \"%s\", \"actor\": \"%s\"}",
                             event.getType(), event.getRepository().getName(), event.getActorLogin());
                             // Uncomment and add the following inside the format method if using createdAtMicro
-                            // , \"created_at_microseconds\": %d", createdAtMicro
+                            // , \"created_at\": %d", createdAtMicro
 
                     producer.send(new ProducerRecord<>(kafkaTopic, message));
                     System.out.println("Sent message: " + message);
