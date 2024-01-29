@@ -4,10 +4,13 @@ from kafka import KafkaProducer
 import json
 import time
 from datetime import datetime
-
+import os
 
 # Configuration
-GITHUB_TOKEN = 'TOKEN'  # Replace with your GitHub token
+GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')  # Fetch GitHub token from environment variable
+if not GITHUB_TOKEN:
+    raise ValueError("GitHub token not found in environment variables.")
+
 KAFKA_TOPIC = 'github_events'       # Kafka topic to produce messages to
 KAFKA_BROKER = 'localhost:9092'     # Kafka broker address
 FETCH_INTERVAL = 10                 # Time interval between fetches in seconds
@@ -41,22 +44,20 @@ def fetch_and_send_events(etag=None):
     events = response.json()
 
     for event in events:
-         # Parse the created_at field to datetime object
-        created_at_datetime = datetime.strptime(event.get('created_at'), '%Y-%m-%dT%H:%M:%SZ')
-
-        # Convert datetime to epoch in microseconds
-        created_at_microseconds = int(time.mktime(created_at_datetime.timetuple()) * 1e6)
+        # Uncomment the following lines if you want to send the event timestamp 
+        # rather than allow QuestDB to use the server timestamp
+        # created_at_datetime = datetime.strptime(event.get('created_at'), '%Y-%m-%dT%H:%M:%SZ')
+        # created_at_microseconds = int(time.mktime(created_at_datetime.timetuple()) * 1e6)
 
         event_data = {
             'type': event.get('type'),
             'repo': event.get('repo', {}).get('name', 'None'),
             'actor': event.get('actor', {}).get('login', 'Unknown'),
-            'created_at': created_at_microseconds 
-
-            # Add more event details as needed
+            # Uncomment the following line if using created_at_microseconds
+            # 'created_at': created_at_microseconds
         }
         producer.send(KAFKA_TOPIC, event_data)
-        print(f"Sent event: {event['type']} from {event.get('repo', {}).get('name', 'None')} at {event.get('created_at')}")
+        print(f"Sent event: {event.get('type')} from {event.get('repo', {}).get('name', 'None')}")
 
     return new_etag
 
@@ -75,4 +76,5 @@ try:
             time.sleep(FETCH_INTERVAL)
 except KeyboardInterrupt:
     print("Stopping...")
+
 
