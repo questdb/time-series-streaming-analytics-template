@@ -42,7 +42,7 @@ services:
       - ./notebooks:/home/jovyan
     ports:
       - 8888:8888
-    command: sh -c "pip install questdb psycopg[binary] && start-notebook.sh --NotebookApp.password= --NotebookApp.token=" 
+    command: sh -c "pip install questdb psycopg[binary] psycopg2-binary && start-notebook.sh --NotebookApp.password= --NotebookApp.token=" 
     depends_on:
       - questdb
     extra_hosts:
