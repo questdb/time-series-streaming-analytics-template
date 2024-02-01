@@ -6,6 +6,7 @@
 
 # Jupyter notebook
 
+notebooks/.bash_history
 .cache/*
 notebooks/.jupyter/*
 notebooks/.ipython/*
