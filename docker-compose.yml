@@ -14,6 +14,8 @@ services:
       - "host.docker.internal:host-gateway"
     environment:
       - QDB_METRICS_ENABLED=TRUE
+    volumes:
+      - ./questdb/questdb_root:/var/lib/questdb/
 
   grafana:
     image: grafana/grafana-oss

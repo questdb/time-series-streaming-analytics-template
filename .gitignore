@@ -4,6 +4,9 @@
 # Log file
 *.log
 
+questdb/questdb_root/*
+!questdb/questdb_rootdb/.gitkeep
+
 # Jupyter notebook
 
 notebooks/.bash_history
