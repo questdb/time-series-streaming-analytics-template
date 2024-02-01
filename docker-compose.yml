@@ -6,10 +6,10 @@ services:
     container_name: rta_questdb
     restart: always
     ports:
-      - "18812:8812"
-      - "19000:9000"
-      - "19009:9009"
-      - "19003:9003"
+      - "8812:8812"
+      - "9000:9000"
+      - "9009:9009"
+      - "9003:9003"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
@@ -21,7 +21,7 @@ services:
     restart: always
     user: "${DOCKER_COMPOSE_USER_ID:-}"
     ports:
-      - 13000:3000
+      - 3000:3000
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
@@ -29,7 +29,7 @@ services:
       - ./dashboard/grafana/home_dir/etc_grafana:/etc/grafana/
     environment:
       - QDB_CLIENT_PG_HOST=${QDB_CLIENT_PG_HOST:-host.docker.internal}
-      - QDB_CLIENT_PG_PORT=${QDB_CLIENT_PG_PORT:-18812}
+      - QDB_CLIENT_PG_PORT=${QDB_CLIENT_PG_PORT:-8812}
       - QDB_CLIENT_PG_USER=${QDB_CLIENT_PG_USER:-admin}
       - QDB_CLIENT_PG_PASSWORD=${QDB_CLIENT_PG_PASSWORD:-quest}
       # use the value "disable" for local installations, and "require" for QuestDB Cloud
@@ -42,14 +42,16 @@ services:
       - ./notebooks:/home/jovyan
     ports:
       - 8888:8888
-    command: sh -c "pip install questdb psycopg[binary] psycopg2-binary && start-notebook.sh --NotebookApp.password= --NotebookApp.token=" 
+    command: sh -c "pip install questdb psycopg[binary] psycopg2-binary PyGithub kafka-python && start-notebook.sh --NotebookApp.password= --NotebookApp.token=" 
     depends_on:
       - questdb
+      - broker
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
       - RESTARTABLE=yes
       - DOCKER_STACKS_JUPYTER_CMD=notebook
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
 
   broker:
     image: confluentinc/cp-kafka:7.5.3

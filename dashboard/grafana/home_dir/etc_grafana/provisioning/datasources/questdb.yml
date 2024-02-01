@@ -1,5 +1,10 @@
 apiVersion: 1
 
+# list of datasources that should be deleted from the database
+deleteDatasources:
+  - name: qdb
+    orgId: 1
+
 datasources:
   - name: qdb
     type: postgres
@@ -16,3 +21,4 @@ datasources:
       connMaxLifetime: 14400  # Grafana v5.4+
       postgresVersion: 903 # 903=9.3, 904=9.4, 905=9.5, 906=9.6, 1000=10
       timescaledb: false
+
