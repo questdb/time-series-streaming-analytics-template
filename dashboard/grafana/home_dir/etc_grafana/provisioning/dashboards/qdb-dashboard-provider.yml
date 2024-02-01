@@ -4,7 +4,7 @@ providers:
   - name: 'questdb sample dashboards'
     type: file
     disableDeletion: false
-    updateIntervalSeconds: 1000
+    updateIntervalSeconds: 500
     options:
       path: /var/lib/grafana/dashboards
 
