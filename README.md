@@ -43,7 +43,7 @@ If you want to stop the components at any point, you can just `ctrl+c` and you c
 In this section we will use the Jupyter Notebook environment to ingest data using Python. To ingest data using NodeJS,
 Golang, Rust, or JAVA, please go to the [ingestion](#ingestion) section of this document for details.
 
-Navigate to `http://localhost:8888/notebooks/SendGithubEventsToKafka.ipynb`.
+Navigate to [http://localhost:8888/notebooks/Send-Github-Events-To-Kafka.ipynb](http://localhost:8888/notebooks/Send-Github-Events-To-Kafka.ipynb).
 
 This notebook will use the GitHub API to collect public events, will send the events to Apache Kafka using a topic named `github_events`, then wait 10 seconds to avoid any API rates. It will
 keep sending data until you click stop or exit the notebook.
@@ -79,14 +79,14 @@ docker, we can attach to the container and invoke Kafka topics from itself, as i
 
 `docker exec -ti rta_kafka_broker kafka-topics --list --bootstrap-server localhost:9092`
 
-If you run the Jupyter Notebook `SendGithubEventsToKafka.ipynb`, the output of this command should include a topic
+If you run the Jupyter Notebook `Send-Github-Events-To-Kafka.ipynb`, the output of this command should include a topic
 named `github_events`.
 
 We can also consume events from that topic by running:
 `docker exec -ti rta_kafka_broker kafka-console-consumer --bootstrap-server localhost:9092 --topic github_events`.
 
 If you didn't stop the Jupyter Notebook, you should see new entries every few seconds. If you stopped it, you can
-[open it](http://localhost:8888/notebooks/SendGithubEventsToKafka.ipynb) and run it again. New entries should appear on
+[open it](http://localhost:8888/notebooks/Send-Github-Events-To-Kafka.ipynb) and run it again. New entries should appear on
 your console as it runs.
 
 Notice that even if we are consuming data from this topic, the data is still being ingested into QuestDB. This is one of
@@ -147,7 +147,7 @@ in JSON format. The full list of parameters available to this connector is
 
 QuestDB offers a web console for running queries and uploading CSVs at [http://localhost:9000](http://localhost:9000).
 
-If you have been ingesting data with the Jupyter Notebook `SendGithubEventsToKafka.ipynb`, you should see
+If you have been ingesting data with the Jupyter Notebook `Send-Github-Events-To-Kafka.ipynb`, you should see
 one table named `github_events`. You will eventually see other tables with monitoring data from QuestDB itself and from the Kafka broker, as we are collecting metrics and ingesting them into QuestDB for [monitoring](#monitoring-metrics).
 
 Other than standard SQL, QuestDB offers [SQL extensions](https://questdb.io/docs/concept/sql-extensions/) for dealing with time-series data. You can for example run this query:
