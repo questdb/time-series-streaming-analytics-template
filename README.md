@@ -174,16 +174,14 @@ You will notice QuestDB uses the user `admin`, password `quest`, postgresql port
 
 TODO
 
+ Jupyter Notebook, web-based interactive platform to explore and prepare data, and to train forecasting models.
+
 ## Visualizing data with Grafana
 
- Ingestion scripts in Python, Java, Golang, Rust, and NodeJS. These scripts read public data from the GitHub events API
-and send them to Apache Kafka
-- [Apache Kafka](https://kafka.apache.org/), message broker for reliable high-performance event ingestion and temporary storage.
-- Kafka Connect, component to pipe data between Apache Kafka and QuestDB.
-- [QuestDB](https://questdb.io), fast time-series database for permanent storage and for both real-time and batch analytics.
-- Telegraf, server agent to collect metrics from Kafka and QuestDB and store them in QuestDB for monitoring.
+TODO
+
 - Grafana, observability platform to connect to QuestDB and display business and monitoring dashboards in real time.
-- Jupyter Notebook, web-based interactive platform to explore and prepare data, and to train forecasting models.
+
 
 ## Ingestion
 
@@ -200,6 +198,9 @@ You probably want to send data to Kafka and from there to QuestDB, but if you wa
 ## Monitoring metrics
 
 TODO
+
+- Telegraf, server agent to collect metrics from Kafka and QuestDB and store them in QuestDB for monitoring.
+
 
 ## Full list of components, ports, and volumes
 
@@ -251,33 +252,6 @@ Please note this will still keep the data in the locally mounted directories, mo
 folders. You can remove the local data like this
 `rm -r questdb/questdb_root/* dashboard/grafana/home_dir/var_lib_grafana/alerting dashboard/grafana/home_dir/var_lib_grafana/grafana.db dashboard/grafana/home_dir/var_lib_grafana/csv`
 
-
-## Docker-compose local deployment
-
-Docker compose will provision an environment with  Apache Kafka, Apache Kafka Connect,  Questdb, Grafana, and Jupyter Notebook. The whole process will take about 1-2 minutes, depending on yout internet speed downloading the container images.
-
-```
-git clone https://github.com/javier/streaming-analytics-template.git
-cd streaming-analytics-template
-docker-compose up
-```
-
-After starting, all the components should be available, but you will not see data until you proceed to the next step, ingestion.
-
-
-The grafana web interface will be available at http://localhost:13000/d/qdb-ilp-demo/device-data-questdb-demo?orgId=1&refresh=5s.
-User is "demo" and password is "quest".
-
-The QuestDB console is available at http://localhost:19000. Default user not needed, but it is "admin", with password "quest"
-
-The Jupyter notebook will be available at http://localhost:18888
-
-
-Stop the demo via:
-
-```
-docker-compose down
-```
 
 ## Starting and configuring components individually
 TODO
