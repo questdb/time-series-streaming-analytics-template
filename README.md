@@ -212,11 +212,88 @@ For details on how to integrate QuestDB and Grafana you can visit the
 
 ## Ingestion
 
-You probably want to send data to Kafka and from there to QuestDB, but if you want to skip Kafka and send directly to QuestDB, you can skip to the next section
+You have already seen how to send data to Kafka from a [Jupyter Notebook](#end-to-end-ingestion-and-visualization). If
+you prefer to send data to Kafka from a stand-alone Python script, or if you want to use other programming languages,
+this template provides [several scripts you can use](#ingesting-streaming-data-into-kafka-using-go-java-or-python).
 
-### Ingesting streaming data into Kafka using Go, Java, or Python
+If you prefer to skip sending data to Kafka and prefer to ingest directly into QuestDB, please skip to [the next section](#ingesting-streaming-data-directly-into-questdb)
 
-### Ingesting streaming data directly into QuestDB using Go, Java, or Python
+### Ingesting streaming data into Kafka using Python, NodeJS, Java, Go, or Rust
+
+The scripts will read data from the GitHub public API, and will send to a Kafka topic named `github_events`. New events
+will be fetched every 10 seconds to avoid any API rate limits.
+
+All the scripts in this section require the `GITHUB_TOKEN` environment variable.
+
+`export GITHUB_TOKEN=<YOUR_TOKEN>`
+
+#### Python
+
+Open the `./ingestion/python` folder and install the requirements
+
+```
+pip install -r requirements.txt
+```
+
+Now just execute via
+
+```
+python github_events.py
+```
+
+#### NodeJS
+
+Open the `./ingestion/nodejs` folder and install the requirements
+
+```
+npm install node-rdkafka @octokit/rest
+```
+
+Now just execute via
+
+```
+node github_events.js
+```
+
+#### Java
+
+Open the `./ingestion/java/github_events` folder and build the jar file
+
+```
+mvn package
+```
+
+Now just execute via
+
+```
+java -jar target/github-events-1.0-SNAPSHOT-jar-with-dependencies.jar
+```
+
+#### Go
+
+Open the `./ingestion/go/github_events` folder and get the dependencies
+
+```
+go get
+```
+
+Now just execute via
+
+```
+go run .
+```
+
+#### Rust
+
+Open the `./ingestion/rust/github_events` folder and execute via
+
+```
+cargo run
+```
+
+The initial execution will take a few seconds as the project is built. Subsequent executions should start immediately.
+
+### Ingesting streaming data directly into QuestDB
 
 
 ![alt text](iot_data_dashboard_screenshot.png)
