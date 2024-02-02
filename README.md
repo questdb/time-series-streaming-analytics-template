@@ -2,20 +2,11 @@
 
 This repository can be used as a template for near real-time analytics using open source technologies.
 
-It will collect public events from the GitHub API, send them to a message broker (Apache Kafka), persist them into a fast time-series database (QuestDB), and visualize them on a dashboard (Grafana). It also provides a web-based development environment (Jupyter Notebook) for data science and machine learning, and monitoring metrics are captured by a server agent (telegraf) and stored into the time-series database (QuestDB).
+It will collect public events from the GitHub API, send them to a message broker (Apache Kafka), persist them into a fast time-series database ([QuestDB](https://questdb.io)), and visualize them on a dashboard (Grafana). It also provides a web-based development environment (Jupyter Notebook) for data science and machine learning, and monitoring metrics are captured by a server agent (telegraf) and stored into the time-series database (QuestDB).
 
 ![alt text](github_events_dashboard_screenshot.png)
 
-All the components can be started with a single `docker-compose` command, or can be deployed independently. The included components are:
-
-- Ingestion scripts in Python, Java, Golang, Rust, and NodeJS. These scripts read public data from the GitHub events API
-and send them to Apache Kafka
-- Apache Kafka, message broker for reliable high-performance event ingestion and temporary storage.
-- Kafka Connect, component to pipe data between Apache Kafka and QuestDB.
-- QuestDB, fast time-series database for permanent storage and for both real-time and batch analytics.
-- Telegraf, server agent to collect metrics from Kafka and QuestDB and store them in QuestDB for monitoring.
-- Grafana, observability platform to connect to QuestDB and display business and monitoring dashboards in real time.
-- Jupyter Notebook, web-based interactive platform to explore and prepare data, and to train forecasting models.
+All the components can be started with a single `docker-compose` command, or can be deployed independently.
 
 _Note_: All the components use the bare minimum configuration needed to run this template. Make sure you double check the configuration and adjust accordingly if you are planning to run this in production.
 
@@ -73,7 +64,7 @@ Let's explore a bit more.
 
 ## Checking Data on Kafka
 
-Apache Kafka provides a unified, high-throughput, low-latency platform for handling real-time data feeds. Data is
+[Apache Kafka](https://kafka.apache.org/) provides a unified, high-throughput, low-latency platform for handling real-time data feeds. Data is
 organized into `topics` and store reliably for a configured retention period. Consumers can then read data from those
 topics immediately, or whenever is more convenient for them.
 
@@ -145,15 +136,54 @@ in JSON format. The full list of parameters available to this connector is
 
 ## Querying Data on QuestDB
 
+ [QuestDB](https://questdb.io) is fast time-series database for high throughput and fast SQL queries with operational simplicity. It is designed to run performant analytics over billions of rows. Since we are
+ working with streaming data, and streaming data tends to have a timestamp and usually requires timely
+ analytics, it makes sense to use a time-series database rather than a generic one.
+
+ QuestDB can ingest data in a number of ways: using Kafka Connect, as we are doing in this template, via
+ the [QuestDB Client Libraries](https://questdb.io/docs/reference/clients/overview/) for fast ingestion,with any [Postgresql-compatible library](https://questdb.io/docs/develop/insert-data/#postgresql-wire-protocol),  issuing HTTP calls to the [REST API(https://questdb.io/docs/develop/insert-data/#http-rest-api), or simply [uploading CSV files](https://questdb.io/docs/develop/insert-data/#uploading-csv-files).
+
+ Data is stored into tables and queried via SQL. You can issue your SQL statements with any Postgresql driver or with any HTTP client via the REST API.
+
+QuestDB offers a web console for running queries and uploading CSVs at [http://localhost:9000](http://localhost:9000).
+
+If you have been ingesting data with the Jupyter Notebook `SendGithubEventsToKafka.ipynb`, you should see
+one table named `github_events`. You will eventually see other tables with monitoring data from QuestDB itself and from the Kafka broker, as we are collecting metrics and ingesting them into QuestDB for [monitoring](#monitoring-metrics).
+
+Other than standard SQL, QuestDB offers [SQL extensions](https://questdb.io/docs/concept/sql-extensions/) for dealing with time-series data. You can for example run this query:
+
+```SQL
+SELECT timestamp, repo, COUNT() FROM github_events SAMPLE BY 5m;
+```
+
+This query returns the count of events by repository in 5 minute intervals. Intervals can be any arbitrary amount from microseconds to years.
+
+Data on QuestDB is stored in a columnar format, [partitioned by time](https://questdb.io/docs/concept/partitions/), and physically sorted by increasing timestamp. Ingestion and Querying don't block each other, so ingestion performance remains steady even when there is high usage of queries. With a few CPUs, you can sustain ingestions of several millions of rows per second while querying billions of rows.
+
+All of the above makes QuestDB a great candidate for storing your streaming data.
+
+### Querying QuestDB from a Jupyter Notebook
+
+Since QuestDB is compatible with the Postgresql-wire protocol, we can issue queries from any programming language. You can, for example, use Python and the popular `psycopg` library to query data. Let's open the
+Jupyter Notebook [http://localhost:8888/notebooks/questdb-connect-and-query.ipynb]([http://localhost:8888/notebooks/questdb-connect-and-query.ipynb) and execute the script in there.
+
+You will notice QuestDB uses the user `admin`, password `quest`, postgresql port `8812`, and dbname `qdb` by default.
+
+
+## Data Science and Machine Learning with a Jupyter Notebook
+
 TODO
 
-### Querying data from Jupyter Notebooks
+## Visualizing data with Grafana
 
-TODO
-
-## Data Science and Machine Learning with Jupyter Notebooks
-
-TODO
+ Ingestion scripts in Python, Java, Golang, Rust, and NodeJS. These scripts read public data from the GitHub events API
+and send them to Apache Kafka
+- [Apache Kafka](https://kafka.apache.org/), message broker for reliable high-performance event ingestion and temporary storage.
+- Kafka Connect, component to pipe data between Apache Kafka and QuestDB.
+- [QuestDB](https://questdb.io), fast time-series database for permanent storage and for both real-time and batch analytics.
+- Telegraf, server agent to collect metrics from Kafka and QuestDB and store them in QuestDB for monitoring.
+- Grafana, observability platform to connect to QuestDB and display business and monitoring dashboards in real time.
+- Jupyter Notebook, web-based interactive platform to explore and prepare data, and to train forecasting models.
 
 ## Ingestion
 
@@ -222,7 +252,6 @@ folders. You can remove the local data like this
 `rm -r questdb/questdb_root/* dashboard/grafana/home_dir/var_lib_grafana/alerting dashboard/grafana/home_dir/var_lib_grafana/grafana.db dashboard/grafana/home_dir/var_lib_grafana/csv`
 
 
-
 ## Docker-compose local deployment
 
 Docker compose will provision an environment with  Apache Kafka, Apache Kafka Connect,  Questdb, Grafana, and Jupyter Notebook. The whole process will take about 1-2 minutes, depending on yout internet speed downloading the container images.
@@ -250,8 +279,7 @@ Stop the demo via:
 docker-compose down
 ```
 
-
-## Starting and configuring components individually
-
+## Starting and configuring components individually
 TODO
+
 
