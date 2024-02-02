@@ -431,7 +431,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT timestamp as time, type, count(*) as total FROM github_events \nsample by 1m;",
+          "rawSql": "SELECT timestamp as time, type, count(*) as total FROM github_events \nsample by 15s;",
           "refId": "A",
           "sql": {
             "columns": [
