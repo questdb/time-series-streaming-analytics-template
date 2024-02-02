@@ -4,6 +4,8 @@ This repository can be used as a template for near real-time analytics using ope
 
 It will collect public events from the GitHub API, send them to a message broker (Apache Kafka), persist them into a fast time-series database (QuestDB), and visualize them on a dashboard (Grafana). It also provides a web-based development environment (Jupyter Notebook) for data science and machine learning, and monitoring metrics are captured by a server agent (telegraf) and stored into the time-series database (QuestDB).
 
+![alt text](github_events_dashboard_screenshot.png)
+
 All the components can be started with a single `docker-compose` command, or can be deployed independently. The included components are:
 
 - Ingestion scripts in Python, Java, Golang, Rust, and NodeJS. These scripts read public data from the GitHub events API
@@ -19,7 +21,7 @@ _Note_: All the components use the bare minimum configuration needed to run this
 
 ## Pre-requisites
 
-In order to run the ingestion scripts, you need a Github Token. I recommend using a token with read access to public repositories only. https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens
+In order to run the ingestion scripts, you need a Github Token. I recommend using a [personal token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) with read access to public repositories only.
 
 Once you have the token, you can set is as an environment variable and it will be picked up by all the scripts (and by docker-compose for the Jupyter Notebook environment)
 
@@ -29,7 +31,7 @@ An unsafer alternative would be pasting the token directly in the script.
 
 ## Starting up via Docker-compose
 
-This is the recommended way to start all the components, as they will have all dependencies and configuration ready. If you prefer to start each component separately, read the _Starting and configuring components individually_ section below.
+This is the recommended way to start all the components, as they will have all dependencies and configuration ready. If you prefer to start each component separately, read the [Starting and configuring components individually](#starting-and-configuring-components-individually) section below. We will be going through each component, but you can check later in this document all the [docker volumes and ports](#full-list-of-components-ports-and-volumes) we are configuring.
 
 From the root directory of this repository, execute:
 
@@ -39,12 +41,16 @@ This might take a few moments, as it needs to download several docker images and
 start on my laptop over a wired connection it takes between 30 seconds and 1 minute. Subsequent starts should be way
 faster. The downloaded images will use about 1Gb on your disk.
 
-After a few moments, you should see the logs stabilize and stop scrolling fast. There will always be some activity, as the stack collects and store some metrics, but those appear only every few seconds. At that
-point the project is fully available.
+After a few moments, you should see the logs stabilize and stop scrolling fast. There will always be some activity, as the stack collects and store some metrics, but those appear only every few seconds. At that point the project is fully available.
+
+If you want to stop the components at any point, you can just `ctrl+c` and you can restart later running `docker-compose up`. For more permanent removal, please do check the
+[Stopping all the components](#stopping-all-the-components) section.
+
 
 ## End-to-end ingestion and visualization
 
-To ingest data using NodeJS, Golang, Rust, or JAVA, please go to the `ingestion` section of this document for details. In this section we will use the Jupyter Notebook environment to ingest data using Python.
+In this section we will use the Jupyter Notebook environment to ingest data using Python. To ingest data using NodeJS,
+Golang, Rust, or JAVA, please go to the [ingestion](#ingestion) section of this document for details.
 
 Navigate to `http://localhost:8888/notebooks/SendGithubEventsToKafka.ipynb`.
 
@@ -151,7 +157,15 @@ TODO
 
 ## Ingestion
 
-TODO
+You probably want to send data to Kafka and from there to QuestDB, but if you want to skip Kafka and send directly to QuestDB, you can skip to the next section
+
+### Ingesting streaming data into Kafka using Go, Java, or Python
+
+### Ingesting streaming data directly into QuestDB using Go, Java, or Python
+
+
+![alt text](iot_data_dashboard_screenshot.png)
+
 
 ## Monitoring metrics
 
@@ -191,6 +205,24 @@ pre-provisioned notebooks and any new notebooks you create.
     - connects to: It will connect to `broker:8778`, `questdb:9003`, and `questdb:9009`
 
 
+## Stopping all the components
+
+You can stop all the components by running
+`docker-compose down`
+
+Alternatively you can also remove the associated docker volumes (the locally mounted directories will keep the data and
+configurations)
+`docker-compose down -v`
+
+If you want to remove all the components and their associated docker images (they use about 1Gig on your disk), you can run
+`docker-compose down -v --rmi all`
+
+Please note this will still keep the data in the locally mounted directories, most notably in the QuestDB and Grafana
+folders. You can remove the local data like this
+`rm -r questdb/questdb_root/* dashboard/grafana/home_dir/var_lib_grafana/alerting dashboard/grafana/home_dir/var_lib_grafana/grafana.db dashboard/grafana/home_dir/var_lib_grafana/csv`
+
+
+
 ## Docker-compose local deployment
 
 Docker compose will provision an environment with  Apache Kafka, Apache Kafka Connect,  Questdb, Grafana, and Jupyter Notebook. The whole process will take about 1-2 minutes, depending on yout internet speed downloading the container images.
@@ -219,15 +251,7 @@ docker-compose down
 ```
 
 
-## Data Ingestion
-
-You probably want to send data to Kafka and from there to QuestDB, but if you want to skip Kafka and send directly to QuestDB, you can skip to the next section
-
-### Ingesting streaming data into Kafka using Go, Java, or Python
-
-### Ingesting streaming data directly into QuestDB using Go, Java, or Python
-
-
 ## Starting and configuring components individually
 
 TODO
+
