@@ -4,7 +4,7 @@ This repository can be used as a template for near real-time analytics using ope
 
 It will collect public events from the GitHub API, send them to a message broker (Apache Kafka), persist them into a fast time-series database ([QuestDB](https://questdb.io)), and visualize them on a dashboard (Grafana). It also provides a web-based development environment (Jupyter Notebook) for data science and machine learning, and monitoring metrics are captured by a server agent (telegraf) and stored into the time-series database (QuestDB).
 
-![alt text](github_events_dashboard_screenshot.png)
+![github events dashboard](github_events_dashboard_screenshot.png)
 
 All the components can be started with a single `docker-compose` command, or can be deployed independently.
 
@@ -350,7 +350,7 @@ While you are running the notebook, you can see a live dashboard at
 [http://localhost:3000/d/qdb-iot-demo/device-data-questdb-demo?orgId=1&refresh=500ms&from=now-5m&to=now](http://localhost:3000/d/qdb-iot-demo/device-data-questdb-demo?orgId=1&refresh=500ms&from=now-5m&to=now).
 The user for Grafana login is `admin` and password `quest`.
 
-![alt text](iot_data_dashboard_screenshot.png)
+![iot data dashboard](iot_data_dashboard_screenshot.png)
 
 If you prefer to use [Java](https://github.com/questdb/questdb-quickstart/tree/main/ingestion/java) or
 [Go](https://github.com/questdb/questdb-quickstart/tree/main/ingestion/go) for ingesting into QuestDB, you can
@@ -358,9 +358,25 @@ find two examples ingesting into this same table at the QuestDB quickstart repos
 
 ## Monitoring metrics
 
-TODO
+To monitor data, you usually have an agent running on your servers that collects metrics and then ingest into a time-series database.
+There are many agents to choose from, but a popular option that works well with Kafka and QuestDB is the
+[Telegraf Agent](https://github.com/influxdata/telegraf/tree/master).
 
-- Telegraf, server agent to collect metrics from Kafka and QuestDB and store them in QuestDB for monitoring.
+Telegraf supports many input plugins as metrics origin, many output plugins as metrics destination, and supports
+aggregators and transforms between input and output.
+
+In this template, we have a telegraf configuration in the `./monitoring/telegraf` folder. The configuration reads
+metrics from the questdb monitoring endpoint (in prometheus format) `http://questdb:9003/metrics` and from the Kafka
+MX metrics server that we are exposing through a plugin on `http://broker:8778/jolokia`.
+
+After collecting the metrics and applying some filtering and transforms, metrics are then written into several tables in QuestDB.
+
+On a production environment you would probably want to store metrics on a different server, but for this template we are
+storing the metrics in the same QuestDB instance where we store the user data.
+
+We are not providing any monitoring dashboard on this template, but feel free to explore the metrics on the
+Jupyter Notebook [http://localhost:8888/notebooks/Monitoring-Kafka-and-Questdb.ipynb](http://localhost:8888/notebooks/Monitoring-Kafka-and-Questdb.ipynb),
+or even better at `http://localhost:9000`, and then try to create a Grafana dashboard at `http://localhost:3000`.
 
 
 ## Full list of components, ports, and volumes
