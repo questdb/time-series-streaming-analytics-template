@@ -36,29 +36,31 @@ After a few moments, you should see the logs stabilize and stop scrolling fast. 
 
 ```mermaid
 graph TD
-   IE[IoT Events] -->|ILP Protocol into iot_data table| Q
-  subgraph GitHubEvents
-    GE[GitHub Events] -->|Python, NodeJS, Java, Go, Rust into github_events topic | AK[Apache Kafka]
-    AK -->|github_events topic| KC
-  end
-
-  KC[Kafka Connect] -->|into github_events table| Q[QuestDB]
-
-
-  subgraph ML
+   subgraph "Analytics and ML"
     Q -->|SELECT FROM github_events| DSN[Data Science Notebook]
     Q -->|SELECT FROM github_events| FM[Forecast Model]
   end
 
-  subgraph Dashboards
+
+  subgraph "Data Ingestion"
+    GE[GitHub Events] -->|Python, NodeJS, Java, Go, Rust into github_events topic | AK[Apache Kafka]
+    AK -->|github_events topic| KC
+    IE[IoT Events] -->|ILP Protocol into iot_data table| Q
+    KC[Kafka Connect] -->|into github_events table| Q[QuestDB]
+  end
+
+  subgraph "Real-time dashboards"
     Q -->|SELECT FROM github_events and iot_data tables| G[Grafana]
   end
+
+
 
   subgraph Monitoring
     Q -->|pulls Prometheus metrics| TA[Telegraf Agent]
     AK -->|pulls MX metrics| TA
     TA -->|into monitoring tables| Q
   end
+
 ```
 If you want to stop the components at any point, you can just `ctrl+c` and you can restart later running `docker-compose up`. For more permanent removal, please do check the
 [Stopping all the components](#stopping-all-the-components) section.
