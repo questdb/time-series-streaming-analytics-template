@@ -243,7 +243,7 @@ python github_events.py
 
 #### NodeJS
 
-Open the `./ingestion/nodejs` folder and install the requirements
+Open the `./ingestion/nodejs` folder and install the dependencies
 
 ```
 npm install node-rdkafka @octokit/rest
@@ -293,11 +293,37 @@ cargo run
 
 The initial execution will take a few seconds as the project is built. Subsequent executions should start immediately.
 
+
 ### Ingesting streaming data directly into QuestDB
 
+QuestDB is designed for high throughput, and can ingest streaming data at over 4 million events per second (using 12 CPUs and a fast drive).
+
+If your only reason to use Kafka in front of QuestDB is for ingestion speed, it might be the case you don't need it.
+
+Of course having Kafka as the ingestion layer gives you more flexibility, as you can easily send data to multiple
+consumers — other than QuestDB —, or you can restart the QuestDB server without stopping ingestion. On the other hand,
+adding Kafka means some (minor) extra latency and one more component to manage.
+
+In the end, some teams would prefer to ingest into Kafka, and some directly into QuestDB. It all depends on your
+specific use case. QuestDB supports multiple ways of ingesting data, but the fastest is by using the ILP protocol
+via the [official client libraries](https://questdb.io/docs/reference/clients/overview/).
+
+The Jupyter Notebook [http://localhost:8888/notebooks/IoTEventsToQuestDB.ipynb](http://localhost:8888/notebooks/IoTEventsToQuestDB.ipynb)
+uses the Python client for convenience, but the usage would be very similar using the client libraries available in
+NodeJs, Java, .Net, C/C++, Rust, or Go.
+
+The notebook connects to port 9009 of the questdb container and sends data into a table named "iot_data". The data is
+just randomly generated to keep the demo as simple as possible.
+
+While you are running the notebook, you can see a live dashboard at
+[http://localhost:3000/d/qdb-iot-demo/device-data-questdb-demo?orgId=1&refresh=500ms&from=now-5m&to=now](http://localhost:3000/d/qdb-iot-demo/device-data-questdb-demo?orgId=1&refresh=500ms&from=now-5m&to=now).
+The user for Grafana login is `admin` and password `quest`.
 
 ![alt text](iot_data_dashboard_screenshot.png)
 
+If you prefer to use [Java](https://github.com/questdb/questdb-quickstart/tree/main/ingestion/java) or
+[Go](https://github.com/questdb/questdb-quickstart/tree/main/ingestion/go) for ingesting into QuestDB, you can
+find two examples ingesting into this same table at the QuestDB quickstart repository.
 
 ## Monitoring metrics
 
