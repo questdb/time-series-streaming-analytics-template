@@ -53,7 +53,7 @@ you can just paste it where it says `<YOUR_GITHUB_TOKEN>`.
 
 The data you send to Kafka will be passed to QuestDB, where it will be stored into a table named `github_events`. We will explore the database later.
 
-For now, you can navigate to the live dashboard at `http://localhost:3000/d/github-events-questdb/github-events-dashboard?orgId=1&refresh=5s`. User is `admin` and password `quest`.
+For now, you can navigate to the live dashboard at [http://localhost:3000/d/github-events-questdb/github-events-dashboard?orgId=1&refresh=5s](http://localhost:3000/d/github-events-questdb/github-events-dashboard?orgId=1&refresh=5s). User is `admin` and password `quest`.
 
 You should see how data gets updated. The dashboard auto refreshes every 5 seconds, but data is only collected every 10 seconds, so it will take ~10 seconds to see new results on the charts. For the first few minutes some of the charts might look a bit empty, but after enough data is collected it should look better.
 
@@ -184,10 +184,31 @@ _Note_: This notebook is not a comprehensive work in time-series forecasting, bu
 
 ## Visualizing data with Grafana
 
-TODO
+Grafana is an observability platform you can use to display business or monitoring dashboards and to generate alerts if
+some conditions are met.
 
-- Grafana, observability platform to connect to QuestDB and display business and monitoring dashboards in real time.
+Grafana supports a large number of datasources. In our case, you will be using Grafana to connect to QuestDB, and
+display business dashboards that get data running SQL queries behind the scenes. The grafana instance in this template
+is pre-configured with a database connection using the Postgresql connector to run queries on QuestDB. If you want
+to check the details, the Grafana config, connection, and dashboards are available at the [./dashboard/grafana](./dashboard/grafana)
+folder in this repository.
 
+
+If you've been following the previous steps, you have already seen the dashboard at
+[http://localhost:3000/d/github-events-questdb/github-events-dashboard?orgId=1&refresh=5s](http://localhost:3000/d/github-events-questdb/github-events-dashboard?orgId=1&refresh=5s). (User is `admin` and password `quest`).
+
+
+If you click at the three dots on the top right of any of the charts in that dashboard and then you click 'Explore', you will see
+the SQL query powering the dashboard. For example, one of the queries in that panel is:
+
+`SELECT timestamp as time, type, count(*) as total FROM github_events sample by 15s;`
+
+If you click on `Edit` rather than `Explore`, you can change the chart type and configuration, but you won't be able to
+save the pre-provisioned dashboard as they are protected. You can always click on the `dashboard settings` icon at the
+top right of the screen, and then `save as` to have your copy so you can play around.
+
+For details on how to integrate QuestDB and Grafana you can visit the
+[QuestDB Third Party Tools](https://questdb.io/docs/third-party-tools/grafana/) docs.
 
 ## Ingestion
 
