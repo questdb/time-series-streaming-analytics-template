@@ -172,9 +172,15 @@ You will notice QuestDB uses the user `admin`, password `quest`, postgresql port
 
 ## Data Science and Machine Learning with a Jupyter Notebook
 
-TODO
+Many projects are happy analysing the past, some also want to predict what will happen based on past data. Time-series forecasting is a very frequent ask when doing streaming analytics.
 
- Jupyter Notebook, web-based interactive platform to explore and prepare data, and to train forecasting models.
+Of course this is not trivial, but fortunately there are some ready-made models or algorithms that you can use as an starting point. This template provides the
+Jupyter Notebook [http://localhost:8888/notebooks/Time-Series-Forecasting-ML.ipynb](http://localhost:8888/notebooks/Time-Series-Forecasting-ML.ipynb) to show how
+you can train a model with data from from the QuestDB `github_events` table, and use that to run predictions. The notebook shows how to train two different
+models: [Prophet](https://github.com/facebook/prophet?tab=readme-ov-file#installation-in-python---pypi-release) and [Linear Regression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html).
+
+_Note_: This notebook is not a comprehensive work in time-series forecasting, but just a show of what can be achieved. In a real-life scenario you would ideally use a large amount of taining data and you would probably fine-tune the model for your use case. Other popular time-series models like ARIMA might give you better results in certain scenarios. If your dataset is very big, you might also want to try LSTM models that could perform better in some cases.
+
 
 ## Visualizing data with Grafana
 
