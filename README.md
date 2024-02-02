@@ -334,7 +334,8 @@ TODO
 
 ## Full list of components, ports, and volumes
 
-The list of components, together with their mounted volumes and available ports are:
+We have already mentioned most of these in previous sections or notebooks, but for your reference, this is the full list
+ of components, docker mounted volumes and open ports when you start with `docker-compose``:
 
 - broker: The Apache Kafka broker
     - volumes: It mounts a volume using the local `./monitoring/kafka-agent` for a needed .jar dependency to enable monitoring
@@ -354,16 +355,18 @@ The list of components, together with their mounted volumes and available ports 
     - port 8812 is the Postgres-wire protocol. You can connect using any postgresql driver with the user: `admin` and password `quest`
     - port 9003 is for healtcheck `http://localhost:9003` and metrics `http://localhost:9003/metrics`
     - connects to: it doesn't initiate any connections, but it gets incoming connections from `kafka-conect`, `jupyter-notebook`, and `telegraf`
-- grafana: It will mount two volumes, pointing at the subfolders of `./dashboard/grafana/home_dir/`. These are used for storing the pre-provisioned credentials, connections, and dashboards, and for any new dashboards you create/
+- grafana:
+    - volumes: It mounts two volumes, pointing at the subfolders of `./dashboard/grafana/home_dir/`. These are used for storing the pre-provisioned credentials, connections, and dashboards, and for any new dashboards you create.
     - port 3000 is the Grafana UI.  `http://localhost:3000`. User is `admin` and password `quest`
     - connects to: `questdb:8812` for getting the data to display
-- jupyter-notebook: it mounts a volume using the `./notebooks` folder. It contains the
-pre-provisioned notebooks and any new notebooks you create.
+- jupyter-notebook:
+    - volumes: it mounts a volume using the `./notebooks` folder. It contains the pre-provisioned notebooks and any new notebooks you create.
     - port 8888: web interface for the Jupyter Notebook environment `http://localhost:8888`
     - connects to: The pre-provisioned scripts will connect to `questdb:8812`, `questdb:9009`, and `broker:29092`
-- telegraf: it mounts a read only volume using the local folder `./monitoring/telegraf/`. This contains the configuration for metrics collection from Apache Kafka and QuestDB.
+- telegraf:
+    - volumes: it mounts a read only volume using the local folder `./monitoring/telegraf/`. This contains the configuration for metrics collection from Apache Kafka and QuestDB.
     - ports: No ports are opened for telegraf
-    - connects to: It will connect to `broker:8778`, `questdb:9003`, and `questdb:9009`
+    - connects to: It will connect to `broker:8778`, `questdb:9003`, and it will write metrics into questdb via `questdb:9009`
 
 
 ## Stopping all the components
