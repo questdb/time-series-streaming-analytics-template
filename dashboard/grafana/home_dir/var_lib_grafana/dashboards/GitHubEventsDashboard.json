@@ -26,7 +26,10 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": {},
+      "datasource": {
+        "type": "postgres",
+        "uid": "P0F15568B0DD880D0"
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -67,7 +70,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT timestamp AS time, count(*) FROM github_events GROUP BY timestamp ORDER BY timestamp;",
+          "rawSql": "SELECT timestamp AS time, count(*) FROM github_events WHERE\n  $__timeFilter(timestamp) GROUP BY timestamp  ORDER BY timestamp;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -119,7 +122,10 @@
       }
     },
     {
-      "datasource": "qdb",
+      "datasource": {
+        "type": "postgres",
+        "uid": "P0F15568B0DD880D0"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -168,7 +174,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT type, count(*) as total FROM github_events GROUP BY type;",
+          "rawSql": "SELECT type, count(*) as total FROM github_events WHERE\n  $__timeFilter(timestamp) GROUP BY type;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -193,7 +199,10 @@
       "type": "piechart"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "postgres",
+        "uid": "P0F15568B0DD880D0"
+      },
       "fieldConfig": {
         "defaults": {
           "mappings": [],
@@ -246,7 +255,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT repo, count(*) as total FROM github_events GROUP BY repo order by total desc limit 10;",
+          "rawSql": "SELECT repo, count(*) as total FROM github_events WHERE\n  $__timeFilter(timestamp) GROUP BY repo order by total desc limit 10;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -271,7 +280,10 @@
       "type": "bargauge"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "postgres",
+        "uid": "P0F15568B0DD880D0"
+      },
       "fieldConfig": {
         "defaults": {
           "mappings": [],
@@ -324,7 +336,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT actor, count(*) as total FROM github_events GROUP BY actor ORDER BY total DESC LIMIT 10;",
+          "rawSql": "SELECT actor, count(*) as total FROM github_events WHERE\n  $__timeFilter(timestamp) GROUP BY actor ORDER BY total DESC LIMIT 10;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -431,7 +443,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT timestamp as time, type, count(*) as total FROM github_events \nsample by 15s;",
+          "rawSql": "SELECT timestamp as time, type, count(*) as total FROM github_events \nWHERE\n  $__timeFilter(timestamp)\nsample by 15s;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -494,6 +506,6 @@
   "timezone": "",
   "title": "GitHub Events Dashboard",
   "uid": "github-events-questdb",
-  "version": 10,
+  "version": 1,
   "weekStart": ""
 }
