@@ -36,7 +36,11 @@ After a few moments, you should see the logs stabilize and stop scrolling fast. 
 
 ```mermaid
 graph TD
-   subgraph "Analytics and ML"
+   subgraph "Data Analytics"
+    Q[QuestDB]
+  end
+
+  subgraph "Data Science and ML"
     Q -->|SELECT FROM github_events| DSN[Data Science Notebook]
     Q -->|SELECT FROM github_events| FM[Forecast Model]
   end
@@ -60,7 +64,6 @@ graph TD
     AK -->|pulls MX metrics| TA
     TA -->|into monitoring tables| Q
   end
-
 ```
 If you want to stop the components at any point, you can just `ctrl+c` and you can restart later running `docker-compose up`. For more permanent removal, please do check the
 [Stopping all the components](#stopping-all-the-components) section.
