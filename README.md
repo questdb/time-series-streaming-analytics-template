@@ -67,11 +67,75 @@ Let's explore a bit more.
 
 ## Checking Data on Kafka
 
-TODO
+Apache Kafka provides a unified, high-throughput, low-latency platform for handling real-time data feeds. Data is
+organized into `topics` and store reliably for a configured retention period. Consumers can then read data from those
+topics immediately, or whenever is more convenient for them.
+
+Kafka uses a binary TCP-based protocol that is optimized for efficiency and allows Kafka to turn a bursty stream of random message writes into linear writes.
+
+There are many open source and commercial tools to add a web interface to Apache Kafka, but Apache Kafka itself doesn't
+has any interface other than its API. However, Kafka includes [several command line tools](https://docs.confluent.io/kafka/operations-tools/kafka-tools.html)
+we can use to manage our cluster and to query configuration and data.
+
+We can, for example, use the `kafka-topics` tool to list and manage topics. Since we are already running a container with
+docker, we can attach to the container and invoke Kafka topics from itself, as in:
+
+`docker exec -ti rta_kafka_broker kafka-topics --list --bootstrap-server localhost:9092`
+
+If you run the Jupyter Notebook `SendGithubEventsToKafka.ipynb`, the output of this command should include a topic
+named `github_events`.
+
+We can also consume events from that topic by running:
+`docker exec -ti rta_kafka_broker kafka-console-consumer --bootstrap-server localhost:9092 --topic github_events`.
+
+If you didn't stop the Jupyter Notebook, you should see new entries every few seconds. If you stopped it, you can
+[open it](http://localhost:8888/notebooks/SendGithubEventsToKafka.ipynb) and run it again. New entries should appear on
+your console as it runs.
+
+Notice that even if we are consuming data from this topic, the data is still being ingested into QuestDB. This is one of
+the main advantages of Kafka: multiple consumers can read data from any topic without interfering with each other, and
+the system keeps track of the latest event each consumer saw, so it would send by default only newer messages. However,
+a consumer can choose to replay data from any point in the past, as long as it is within the retention time range for a
+given topic. Or you can also choose to have multiple consumers reading data from a topic collaboratively, so each message
+is sent only to a single consumer. Not only that, but f you have demanding requirements, you can add several brokers to
+your cluster and partition the topics so the workload will be distributed. All of this with very high performance and
+configurable redundancy.
+
+Having Apache Kafka as the entry point for your data analytics pipeline gives you a good and reliable way of dealing with
+data at any speed and helps you deal with ingestion peaks, decoupling ingestion from your analytical database. Even when
+you have a very fast database, as it is the case with QuestDB, that could keep up with the ingestion rate, it might
+still be a good idea to have Kafka in front so you can tolerate database restarts in the event of any upgrade, or data
+replaying in case of disaster recovery or debugging.
+
 
 ## Checking the connector data on Kafka Connect
 
-TODO
+Apache Kafka is not a push system, [by design](https://kafka.apache.org/documentation.html#design_pull). That means
+that consumers need to poll data at its own pace whenever they are ready to process a new batch of events. While this
+is a good idea from an architecture perspective, implementing that in a reliable way on your consumer is not trivial.
+
+Very conveniently, Apache Kafka comes with [Kafka Connect](https://docs.confluent.io/platform/current/connect/index.html),
+a tool for scalably and reliably streaming data between Apache Kafka and other data systems.
+
+Kafka connect can run as a standalone process or in distributed mode — for scalability and fault tolerance —, and can
+also run conversions and transforms on the fly before sending data to its destination.
+
+You need two things to stream data from Apache Kafka into another system: A connector plugin, in this case the
+`kafka-questdb-connector-0.9.jar`, and a configuration file which, at the very least, will define the origin topic(s),
+the data format, and the destination system.
+
+As it happens with Apache Kafka, there is no native web interface for Kafka Connect, but it exposes a REST API — by
+default on port 8083 — where we can register new configurations for our connections, or check the ones we already have.
+If you are curious, you can inspect the `docker-compose.yml` file to see how it registers two different configurations
+on startup. But it is probably easier to just open the [Kafka-connect-inspect.ipynb](http://localhost:8888/notebooks/Kafka-connect-inspect.ipynb)
+jupyter notebook and execute the cells there, that will connect to the kafka-connect container and output the list of
+connector plugins available in the classpath, the registered connectors, and the configuration for each of the two.
+
+You will notice both configurations will output data to the questdb-connector plugin, using two different Kafka topics for
+the input data, and two different tables on the QuestDB database for the output. You will also notice data is expected
+in JSON format. The full list of parameters available to this connector is
+[documented at the QuestDB website](https://questdb.io/docs/third-party-tools/kafka/questdb-kafka/).
+
 
 ## Querying Data on QuestDB
 
