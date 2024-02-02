@@ -19,7 +19,7 @@ async function fetchAndSendEvents() {
         const { data: events } = await octokit.activity.listPublicEvents();
 
         events.forEach(event => {
-            // Uncomment the following lines if you want to send the event timestamp 
+            // Uncomment the following lines if you want to send the event timestamp
             // let createdAt = new Date(event.created_at);
             // let createdAtMicro = createdAt.getTime() * 1000;
 
@@ -32,6 +32,7 @@ async function fetchAndSendEvents() {
             };
 
             kafkaProducer.produce('github_events', null, Buffer.from(JSON.stringify(eventData)));
+            console.log(`Sent GitHub events: ${event.type}, ${event.repo}, ${event.actor.login}`);
         });
     } catch (error) {
         console.error(`Error fetching GitHub events: ${error}`);
