@@ -34,6 +34,32 @@ faster. The downloaded images will use about 1Gb on your disk.
 
 After a few moments, you should see the logs stabilize and stop scrolling fast. There will always be some activity, as the stack collects and store some metrics, but those appear only every few seconds. At that point the project is fully available.
 
+```mermaid
+graph TD
+   IE[IoT Events] -->|ILP Protocol into iot_data table| Q
+  subgraph GitHubEvents
+    GE[GitHub Events] -->|Python, NodeJS, Java, Go, Rust into github_events topic | AK[Apache Kafka]
+    AK -->|github_events topic| KC
+  end
+
+  KC[Kafka Connect] -->|into github_events table| Q[QuestDB]
+
+
+  subgraph ML
+    Q -->|SELECT FROM github_events| DSN[Data Science Notebook]
+    Q -->|SELECT FROM github_events| FM[Forecast Model]
+  end
+
+  subgraph Dashboards
+    Q -->|SELECT FROM github_events and iot_data tables| G[Grafana]
+  end
+
+  subgraph Monitoring
+    Q -->|pulls Prometheus metrics| TA[Telegraf Agent]
+    AK -->|pulls MX metrics| TA
+    TA -->|into monitoring tables| Q
+  end
+```
 If you want to stop the components at any point, you can just `ctrl+c` and you can restart later running `docker-compose up`. For more permanent removal, please do check the
 [Stopping all the components](#stopping-all-the-components) section.
 
