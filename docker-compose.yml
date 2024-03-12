@@ -44,7 +44,7 @@ services:
       - ./notebooks:/home/jovyan
     ports:
       - 8888:8888
-    command: sh -c "pip install questdb psycopg[binary] psycopg2-binary PyGithub kafka-python && start-notebook.sh --NotebookApp.password= --NotebookApp.token=" 
+    command: sh -c "pip install questdb psycopg[binary] psycopg2-binary PyGithub kafka-python confluent-kafka \"confluent-kafka[avro]\" && start-notebook.sh --NotebookApp.password= --NotebookApp.token="
     depends_on:
       - questdb
       - broker
@@ -84,7 +84,7 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
-      # Replace CLUSTER_ID with a unique base64 UUID using "bin/kafka-storage.sh random-uuid" 
+      # Replace CLUSTER_ID with a unique base64 UUID using "bin/kafka-storage.sh random-uuid"
       # See https://docs.confluent.io/kafka/operations-tools/kafka-tools.html#kafka-storage-sh
       CLUSTER_ID: 'QTkwRDkzMDg3QTdFNDJCRU'
 
@@ -150,7 +150,7 @@ services:
         if [ $$curl_status -eq 200 ] ; then
           break
         fi
-        sleep 5 
+        sleep 5
       done
 
       echo -e "\n--\n+> Registering QuestDB Connector"
@@ -182,11 +182,11 @@ services:
           "value.converter.schemas.enable": false
       }'
 
-      curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/trades/config -d '{
+      curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/questdb-trades/config -d '{
       "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
           "topics": "trades",
           "host": "questdb:9009",
-          "name": "trades",
+          "name": "questdb-trades",
           "value.converter": "io.confluent.connect.avro.AvroConverter",
           "value.converter.schema.registry.url": "http://schema_registry:8081",
           "include.key": false,
