@@ -279,7 +279,7 @@ Alternatively, you can ingest the `trades` dataset sending data to a `trades` to
 a .CSV file and sends data to Kafka using AVRO and the Kafka Schema Registry.
 
 ```
-python send_trades_to_kafka.py ../tradesMarch.csv trades
+python send_trades_to_kafka.py ../../notebooks/tradesMarch.csv trades
 ```
 
 
@@ -336,7 +336,7 @@ go get
 Now just execute via
 
 ```
-go run trades_sender.go --topic="trades" --csv=../../tradesMarch.csv --subject="trades-value"
+go run trades_sender.go --topic="trades" --csv=../../../notebooks/tradesMarch.csv --subject="trades-value"
 ```
 
 
