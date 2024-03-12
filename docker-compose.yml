@@ -88,6 +88,22 @@ services:
       # See https://docs.confluent.io/kafka/operations-tools/kafka-tools.html#kafka-storage-sh
       CLUSTER_ID: 'QTkwRDkzMDg3QTdFNDJCRU'
 
+  schema_registry:
+    image: confluentinc/cp-schema-registry:7.2.1
+    hostname: schema_registry
+    container_name: schema_registry
+    depends_on:
+      - broker
+    ports:
+      - "8081:8081"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema_registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: broker:29092
+      SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: '*'
+      SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: 'GET,POST,PUT,OPTIONS'
+
   kafka-connect:
     image: confluentinc/cp-kafka-connect:7.5.3
     hostname: kafka-connect
@@ -165,6 +181,22 @@ services:
           "timestamp.field.name": "created_at",
           "value.converter.schemas.enable": false
       }'
+
+      curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/trades/config -d '{
+      "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
+          "topics": "trades",
+          "host": "questdb:9009",
+          "name": "trades",
+          "value.converter": "io.confluent.connect.avro.AvroConverter",
+          "value.converter.schema.registry.url": "http://schema_registry:8081",
+          "include.key": false,
+          "key.converter": "io.confluent.connect.avro.AvroConverter",
+          "key.converter.schema.registry.url": "http://schema_registry:8081",
+          "table": "trades",
+          "symbols": "symbol, side",
+          "timestamp.field.name": "timestamp",
+          "value.converter.schemas.enable": true
+      }'
       sleep infinity
 
   telegraf:
@@ -177,3 +209,5 @@ services:
       - ./monitoring/telegraf/kafka_and_questdb_telegraf.conf:/etc/telegraf/telegraf.conf:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
+
