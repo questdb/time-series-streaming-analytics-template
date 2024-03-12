@@ -50,7 +50,10 @@ graph TD
     GE[GitHub Events] -->|Python, NodeJS, Java, Go, Rust into github_events topic | AK[Apache Kafka]
     AK -->|github_events topic| KC
     IE[IoT Events] -->|ILP Protocol into iot_data table| Q
+    AK -->|trades topic| KC
+    AK -->|trades topic| KSR[Kafka Schema Registry]
     KC[Kafka Connect] -->|into github_events table| Q[QuestDB]
+    KC[Kafka Connect] -->|into trades table| Q[QuestDB]
   end
 
   subgraph "Real-time dashboards"
@@ -157,7 +160,7 @@ default on port 8083 — where we can register new configurations for our connec
 If you are curious, you can inspect the `docker-compose.yml` file to see how it registers two different configurations
 on startup. But it is probably easier to just open the [Kafka-connect-inspect.ipynb](http://localhost:8888/notebooks/Kafka-connect-inspect.ipynb)
 jupyter notebook and execute the cells there, that will connect to the kafka-connect container and output the list of
-connector plugins available in the classpath, the registered connectors, and the configuration for each of the two.
+connector plugins available in the classpath, the registered connectors, and the configuration for each of the three.
 
 You will notice both configurations will output data to the questdb-connector plugin, using two different Kafka topics for
 the input data, and two different tables on the QuestDB database for the output. You will also notice data is expected
@@ -272,6 +275,14 @@ Now just execute via
 python github_events.py
 ```
 
+Alternatively, you can ingest the `trades` dataset sending data to a `trades` topic in Kafka. This script reads from
+a .CSV file and sends data to Kafka using AVRO and the Kafka Schema Registry.
+
+```
+python send_trades_to_kafka.py ../tradesMarch.csv trades
+```
+
+
 #### NodeJS
 
 Open the `./ingestion/nodejs` folder and install the dependencies
@@ -313,6 +324,21 @@ Now just execute via
 ```
 go run .
 ```
+
+Alternatively, you can ingest the `trades` dataset sending data to a `trades` topic in Kafka. This script reads from
+a .CSV file and sends data to Kafka using AVRO and the Kafka Schema Registry. Change to the `./ingestion/go/trades`
+folder and get the dependencies.
+
+```
+go get
+```
+
+Now just execute via
+
+```
+go run trades_sender.go --topic="trades" --csv=../../tradesMarch.csv --subject="trades-value"
+```
+
 
 #### Rust
 
