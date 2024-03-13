@@ -6,13 +6,15 @@ It will collect public events from the GitHub API, send them to a message broker
 
 ![github events dashboard](github_events_dashboard_screenshot.png)
 
+The template also includes a trading sample dataset with its own dashboard. The trading dataset contains real crypto currency trades observed between March 1st and March 12th 2024.
+
 All the components can be started with a single `docker-compose` command, or can be deployed independently.
 
 _Note_: All the components use the bare minimum configuration needed to run this template. Make sure you double check the configuration and adjust accordingly if you are planning to run this in production.
 
 ## Pre-requisites
 
-In order to run the ingestion scripts, you need a Github Token. I recommend using a [personal token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) with read access to public repositories only.
+In order to run the GitHub ingestion script, you need a Github Token. I recommend using a [personal token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) with read access to public repositories only. If you will be running only the trading dataset, you don't need any extra requirements.
 
 Once you have the token, you can set is as an environment variable and it will be picked up by all the scripts (and by docker-compose for the Jupyter Notebook environment)
 
@@ -74,6 +76,8 @@ If you want to stop the components at any point, you can just `ctrl+c` and you c
 
 ## End-to-end ingestion and visualization
 
+### Ingesting the GitHub real-time data
+
 In this section we will use the Jupyter Notebook environment to ingest data using Python. To ingest data using NodeJS,
 Golang, Rust, or JAVA, please go to the [ingestion](#ingestion) section of this document for details.
 
@@ -94,7 +98,32 @@ You should see how data gets updated. The dashboard auto refreshes every 5 secon
 At this point you can see you already have a running system in which you are capturing data and
 running it through an end-to-end data analytics platform.
 
-Let's explore a bit more.
+You can now proceed to [checking Data on Kafka](#checking-data-on-kafka).
+
+### Ingesting the trading real-time data
+
+In this section we will use the Jupyter Notebook environment to ingest data using Python. To ingest the trading dataset
+using Golang, or Python from the command line, please go to the [ingestion](#ingestion) section of this document for details.
+
+Navigate to [http://localhost:8888/notebooks/Send-Trades-To-Kafka.ipynb](http://localhost:8888/notebooks/Send-Trades-To-Kafka.ipynb).
+
+This notebook will read the `tradesMarch.csv` file to read trading events, and will send the events to Apache Kafka in
+Avro binary format using a topic named `trades`. The CSV file contains real trades from different crypto currency symbols
+captured with the Coinbase API between March 1st and March 12th 2024. The raw data has been sampled in 30s intervals and
+it contains almost one million rows. By default, the script will override the original date with the current date and
+ will wait 50ms between events before sending to Kafka, to simulate a real time stream and provide
+a nicer visualization. You can override those configurations by changing the constants in the script. It will keep
+sending data until you click stop or exit the notebook, or until the end of the file is reached.
+
+The data you send to Kafka will be passed to QuestDB, where it will be stored into a table named `trades`.
+
+For now, you can navigate to the live dashboard at [http://localhost:3000/d/trades-crypto-currency/trades-crypto-currency?orgId=1&refresh=250ms](http://localhost:3000/d/trades-crypto-currency/trades-crypto-currency?orgId=1&refresh=250ms). User is `admin` and password `quest`.
+
+You should see how data gets updated. The dashboard auto refreshes every 250 milliseconds. For the first few seconds some
+ of the charts might look a bit empty, but after enough data is collected it should look better.
+
+The next sections discuss mostly the GitHub dataset, but you can easily adapt all the queries and scripts to use the
+trading dataset instead. Just remember the table name is `trades` and the topic in Kafka is also named `trades`.
 
 ## Checking Data on Kafka
 
