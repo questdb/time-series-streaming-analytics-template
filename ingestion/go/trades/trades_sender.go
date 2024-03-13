@@ -26,6 +26,8 @@ var (
     schemaRegistryFlag = flag.String("schema-registry", "http://localhost:8081", "Schema Registry URL")
     subjectFlag        = flag.String("subject", "trades-value", "Schema subject name")
     verboseFlag        = flag.Bool("verbose", true, "Enable verbose logging")
+    useCurrentTimeFlag = flag.Bool("use-current-time", false, "Use current system time instead of timestamp from file")
+    delayMsFlag = flag.Int("delay-ms",50 , "Delay in milliseconds before sending each event")
 )
 
 func registerOrGetSchemaID(schemaRegistryURL, subject, schema string) (int, error) {
@@ -115,11 +117,18 @@ func main() {
             log.Fatalf("Error reading line from CSV: %v", err)
         }
 
-        timestamp, err := time.Parse(time.RFC3339Nano, record[4])
-        if err != nil {
-            log.Fatalf("Failed to parse timestamp: %v", err)
+        var timestampMicros int64
+        if *useCurrentTimeFlag {
+            // Use the current time in microseconds
+            timestampMicros = time.Now().UnixNano() / 1000
+        } else {
+            // Parse the timestamp from the CSV file
+            parsedTime, err := time.Parse(time.RFC3339Nano, record[4])
+            if err != nil {
+                log.Fatalf("Failed to parse timestamp: %v", err)
+            }
+            timestampMicros = parsedTime.UnixNano() / 1000
         }
-        timestampMicros := timestamp.UnixNano() / 1000
 
         dataMap := map[string]interface{}{
             "symbol":    record[0],
@@ -138,6 +147,10 @@ func main() {
         buf.WriteByte(0) // Magic byte
         binary.Write(&buf, binary.BigEndian, int32(schemaID))
         buf.Write(binaryData)
+
+        if *delayMsFlag > 0 {
+            time.Sleep(time.Millisecond * time.Duration(*delayMsFlag))
+        }
 
         _, _, err = producer.SendMessage(&sarama.ProducerMessage{
             Topic: *topicFlag,
