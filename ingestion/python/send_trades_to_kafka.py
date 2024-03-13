@@ -15,6 +15,7 @@ def parse_arguments():
     parser.add_argument('--no-timestamp-from-file', dest='timestamp_from_file', action='store_false', help='Use current timestamp instead of the timestamp from file')
     parser.set_defaults(timestamp_from_file=True)
     parser.add_argument('--verbose', action='store_true', help='Print message delivery reports to stdout.')
+    parser.add_argument('--delay-ms', type=int, default=50, help='Delay in milliseconds before sending each event')
     return parser.parse_args()
 
 def get_delivery_report_func(verbose):
@@ -68,6 +69,9 @@ def main():
                 "amount": float(row['amount']),
                 "timestamp": timestamp_micros
             }
+
+            if args.delay_ms > 0:
+                time.sleep(args.delay_ms / 1000.0)  # Convert milliseconds to seconds
 
             avro_producer.produce(topic=args.kafka_topic, value=value, on_delivery=delivery_report_func)
             avro_producer.poll(0)  # Serve delivery callback queue
