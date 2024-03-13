@@ -19,7 +19,6 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 5,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -437,7 +436,6 @@
           }
         }
       ],
-      "timeFrom": "now-1m",
       "title": "Real-time trades",
       "transformations": [
         {
@@ -576,7 +574,6 @@
           }
         }
       ],
-      "timeFrom": "now-5m",
       "title": "Volume heatmap",
       "transformations": [
         {
@@ -784,7 +781,6 @@
           }
         }
       ],
-      "timeFrom": "now-5m",
       "title": "Moving averages for Bitcoin price",
       "transformations": [
         {
@@ -919,7 +915,6 @@
           }
         }
       ],
-      "timeFrom": "now-5m",
       "title": "Bitcoin Candlestick Chart (OHLC)",
       "transparent": true,
       "type": "candlestick"
@@ -1045,7 +1040,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH data as (\nWITH \nBTCUSD as (select timestamp, price from trades where $__timeFilter(timestamp) and symbol = 'BTC-USD' ),\nETHUSD as (select timestamp, price from trades where $__timeFilter(timestamp) and symbol = 'ETH-USD' )\nSELECT BTCUSD.timestamp, corr(BTCUSD.price,ETHUSD.price) from BTCUSD asof join ETHUSD sample by 1m)\nSELECT timestamp\n, avg(corr) over(ORDER BY timestamp range between 1 hour preceding and current row) hourly_corr_rolling\n, avg(corr) over(ORDER BY timestamp range between 24 hour preceding and current row) daily_corr_rolling\nfrom data",
+          "rawSql": "WITH data as (\nWITH \nBTCUSD as (select timestamp, price from trades where $__timeFilter(timestamp) and symbol = 'BTC-USD' ),\nETHUSD as (select timestamp, price from trades where $__timeFilter(timestamp) and symbol = 'ETH-USD' )\nSELECT BTCUSD.timestamp, corr(BTCUSD.price,ETHUSD.price) from BTCUSD asof join ETHUSD sample by 10s)\nSELECT timestamp\n, avg(corr) over(ORDER BY timestamp range between 1 minute preceding and current row) hourly_corr_rolling\n, avg(corr) over(ORDER BY timestamp range between 5 minute preceding and current row) daily_corr_rolling\nfrom data",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1066,7 +1061,6 @@
           }
         }
       ],
-      "timeFrom": "now-12h",
       "title": "Rolling BTC-ETH correlation coefficient",
       "transparent": true,
       "type": "timeseries"
@@ -1106,6 +1100,6 @@
   "timezone": "",
   "title": "Trades - Crypto Currency",
   "uid": "trades-crypto-currency",
-  "version": 3,
+  "version": 1,
   "weekStart": ""
 }

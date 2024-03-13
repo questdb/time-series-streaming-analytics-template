@@ -122,6 +122,8 @@ For now, you can navigate to the live dashboard at [http://localhost:3000/d/trad
 You should see how data gets updated. The dashboard auto refreshes every 250 milliseconds. For the first few seconds some
  of the charts might look a bit empty, but after enough data is collected it should look better.
 
+![trading data dashboard](trading_data_dashboard_screenshot.png)
+
 The next sections discuss mostly the GitHub dataset, but you can easily adapt all the queries and scripts to use the
 trading dataset instead. Just remember the table name is `trades` and the topic in Kafka is also named `trades`.
 
