@@ -197,6 +197,23 @@ services:
           "timestamp.field.name": "timestamp",
           "value.converter.schemas.enable": true
       }'
+
+      curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/questdb-smart-meters/config -d '{
+      "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
+          "topics": "smart-meters",
+          "host": "questdb:9009",
+          "name": "questdb-smart-meters",
+          "value.converter": "io.confluent.connect.avro.AvroConverter",
+          "value.converter.schema.registry.url": "http://schema_registry:8081",
+          "include.key": false,
+          "key.converter": "io.confluent.connect.avro.AvroConverter",
+          "key.converter.schema.registry.url": "http://schema_registry:8081",
+          "table": "smart_meters",
+          "symbols": "device_id, mark_model, status",
+          "timestamp.field.name": "timestamp",
+          "value.converter.schemas.enable": true
+      }'
+
       sleep infinity
 
   telegraf:
