@@ -150,6 +150,11 @@ named `github_events`.
 We can also consume events from that topic by running:
 `docker exec -ti rta_kafka_broker kafka-console-consumer --bootstrap-server localhost:9092 --topic github_events`.
 
+If you are running any of the examples (trades or smart_meters) that use AVRO instead of JSON, the output will be in
+AVRO binary format. To check output of AVRO topics in kafka we provide a python script under `ingestion/python`. The
+script reads data from Kafka and then deserializes to a text format. You can execute via:
+`python kafka_avro_reader.py --topic trades`
+
 If you didn't stop the Jupyter Notebook, you should see new entries every few seconds. If you stopped it, you can
 [open it](http://localhost:8888/notebooks/Send-Github-Events-To-Kafka.ipynb) and run it again. New entries should appear on
 your console as it runs.
