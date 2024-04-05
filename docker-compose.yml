@@ -44,7 +44,7 @@ services:
       - ./notebooks:/home/jovyan
     ports:
       - 8888:8888
-    command: sh -c "pip install questdb psycopg[binary] psycopg2-binary PyGithub kafka-python confluent-kafka \"confluent-kafka[avro]\" && start-notebook.sh --NotebookApp.password= --NotebookApp.token="
+    command: sh -c "pip install questdb psycopg[binary] psycopg2-binary PyGithub kafka-python confluent-kafka \"confluent-kafka[avro]\" fastavro requests && start-notebook.sh --NotebookApp.password= --NotebookApp.token="
     depends_on:
       - questdb
       - broker
