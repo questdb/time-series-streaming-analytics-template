@@ -553,7 +553,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "select timestamp time, left(symbol,strpos(symbol,'-')-1) asset, sum(abs(amount)) from \ntrades where $__timeFilter(timestamp) and \nright(symbol,length(symbol)-strpos(symbol,'-'))= 'USD'\nsample by 5s\norder by symbol, time\n",
+          "rawSql": "select timestamp time, left(symbol,strpos(symbol,'-')-1) asset, sum(abs(amount)) from \ntrades where $__timeFilter(timestamp) and \nright(symbol,length(symbol)-strpos(symbol,'-'))= 'USD'\nsample by 5s\norder by asset, time\n",
           "refId": "A",
           "sql": {
             "columns": [
