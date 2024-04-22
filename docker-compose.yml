@@ -185,7 +185,7 @@ services:
       curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/questdb-trades/config -d '{
       "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
           "topics": "trades",
-         "client.conf.string": "tcp::addr=questdb:9009;",
+         "client.conf.string": "http::addr=questdb:9000;",
           "name": "questdb-trades",
           "value.converter": "io.confluent.connect.avro.AvroConverter",
           "value.converter.schema.registry.url": "http://schema_registry:8081",
@@ -201,7 +201,7 @@ services:
       curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/questdb-smart-meters/config -d '{
       "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
           "topics": "smart-meters",
-          "client.conf.string": "tcp::addr=questdb:9009;",
+          "client.conf.string": "http::addr=questdb:9000;",
           "name": "questdb-smart-meters",
           "value.converter": "io.confluent.connect.avro.AvroConverter",
           "value.converter.schema.registry.url": "http://schema_registry:8081",
