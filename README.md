@@ -152,8 +152,11 @@ We can also consume events from that topic by running:
 
 If you are running any of the examples (trades or smart_meters) that use AVRO instead of JSON, the output will be in
 AVRO binary format. To check output of AVRO topics in kafka we provide a python script under `ingestion/python`. The
-script reads data from Kafka and then deserializes to a text format. You can execute via:
-`python kafka_avro_reader.py --topic trades`
+script reads data from Kafka and then deserializes to a text format. You can execute using docker via:
+
+```shell
+docker exec -it rta_jupyter python /home/ingestion/kafka_avro_reader.py --topic smart-meters --broker rta_kafka_broker:29092 --schema-registry http://rta_schema_registry:8081
+```
 
 If you didn't stop the Jupyter Notebook, you should see new entries every few seconds. If you stopped it, you can
 [open it](http://localhost:8888/notebooks/Send-Github-Events-To-Kafka.ipynb) and run it again. New entries should appear on
@@ -312,11 +315,37 @@ python github_events.py
 ```
 
 Alternatively, you can ingest the `trades` dataset sending data to a `trades` topic in Kafka. This script reads from
-a .CSV file and sends data to Kafka using AVRO and the Kafka Schema Registry.
+a .CSV file and sends data to Kafka using AVRO and the Kafka Schema Registry. You can pass `--help` for options. The
+script will stop after reading the whole CSV (~1,000,000 rows)
+
+Using the local python interpreter:
 
 ```
 python send_trades_to_kafka.py ../../notebooks/tradesMarch.csv trades
 ```
+
+Using the already running Jupyter container:
+```
+docker exec -it rta_jupyter python /home/ingestion/send_trades_to_kafka.py --kafka_broker rta_kafka_broker:29092 --schema_registry http://rta_schema_registry:8081 --no-timestamp-from-file /home/jovyan/tradesMarch.csv trades
+```
+
+We also offer a `smart meters` dataset, that sends data to a `smart-meters` topic in Kafka. This script generates
+synthetic data and sends data to Kafka using AVRO and the Kafka Schema Registry. You can pass `--help` for options.
+Options allow you to control the number of devices or the message rate. The script will stop when reaching the
+`max-messages` number, which defaults to 1,000,000.
+
+
+Using the local python interpreter:
+
+```
+python smart_meters_send_to_kafka.py
+```
+
+Using the already running Jupyter container:
+```
+docker exec -it rta_jupyter python /home/ingestion/smart_meters_send_to_kafka.py --broker rta_kafka_broker:29092 --schema-registry http://rta_schema_registry:8081
+```
+
 
 
 #### NodeJS
