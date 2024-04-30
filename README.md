@@ -486,7 +486,7 @@ We have already mentioned most of these in previous sections or notebooks, but f
     - volumes: It mounts a volume using the local `./kafka-connect-plugins`, needed to enable ingestion into questdb
     - port 8083 for the REST API for the connect service
     - connects to: `broker:29092` and `questdb:9009`
--schema_registry:
+- schema_registry:
     - port 8081 for the Kafka Schema Registry HTTP interface
     - connects to: `broker:29092`
 - questdb:
