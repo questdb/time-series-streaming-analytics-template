@@ -473,7 +473,7 @@ or even better at `http://localhost:9000`, and then try to create a Grafana dash
 ## Full list of components, ports, and volumes
 
 We have already mentioned most of these in previous sections or notebooks, but for your reference, this is the full list
- of components, docker mounted volumes and open ports when you start with `docker-compose``:
+ of components, docker mounted volumes and open ports when you start with `docker-compose up`:
 
 - broker: The Apache Kafka broker
     - volumes: It mounts a volume using the local `./monitoring/kafka-agent` for a needed .jar dependency to enable monitoring
@@ -486,6 +486,9 @@ We have already mentioned most of these in previous sections or notebooks, but f
     - volumes: It mounts a volume using the local `./kafka-connect-plugins`, needed to enable ingestion into questdb
     - port 8083 for the REST API for the connect service
     - connects to: `broker:29092` and `questdb:9009`
+-schema_registry:
+    - port 8081 for the Kafka Schema Registry HTTP interface
+    - connects to: `broker:29092`
 - questdb:
     - volumes: It will mount a volume using the local `./questdb_root` folder. This folder will store all the database files. It is safe to remove the contents of the folder between restarts if you want to wipe the whole database.
     - port 9000 is the REST API and web console, available at http://localhost:9000
