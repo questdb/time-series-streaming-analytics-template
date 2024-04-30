@@ -42,6 +42,7 @@ services:
     container_name: rta_jupyter
     volumes:
       - ./notebooks:/home/jovyan
+      - ./ingestion/python:/home/ingestion
     ports:
       - 8888:8888
     command: sh -c "pip install questdb psycopg[binary] psycopg2-binary PyGithub kafka-python confluent-kafka \"confluent-kafka[avro]\" fastavro requests && start-notebook.sh --NotebookApp.password= --NotebookApp.token="
@@ -91,7 +92,7 @@ services:
   schema_registry:
     image: confluentinc/cp-schema-registry:7.2.1
     hostname: schema_registry
-    container_name: schema_registry
+    container_name: rta_schema_registry
     depends_on:
       - broker
     ports:
@@ -185,7 +186,7 @@ services:
       curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/questdb-trades/config -d '{
       "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
           "topics": "trades",
-         "client.conf.string": "http::addr=questdb:9000;",
+         "client.conf.string": "tcp::addr=questdb:9009;",
           "name": "questdb-trades",
           "value.converter": "io.confluent.connect.avro.AvroConverter",
           "value.converter.schema.registry.url": "http://schema_registry:8081",
