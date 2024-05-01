@@ -415,7 +415,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT timestamp time, symbol,\n  case when side ='buy' then amount*price \n  else -1*amount*price end trade \nfrom trades where $__timeFilter(timestamp) and \nsymbol like '%-USD'",
+          "rawSql": "select timestamp time, left(symbol,strpos(symbol,'-')-1) asset, sum(abs(amount)) from \ntrades where $__timeFilter(timestamp) and \nright(symbol,length(symbol)-strpos(symbol,'-'))= 'USD'\nsample by 5s\norder by asset, time\n",
           "refId": "A",
           "sql": {
             "columns": [
@@ -760,7 +760,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT timestamp time, symbol, price as priceBtc\n, avg(price) over (PARTITION BY symbol ORDER BY timestamp RANGE between 30 seconds PRECEDING AND CURRENT ROW) movingAvg30Sec\n, avg(price) over (PARTITION BY symbol ORDER BY timestamp RANGE between 45 seconds PRECEDING AND CURRENT ROW) movingAvg45Sec\nFROM trades WHERE $__timeFilter(timestamp) AND symbol = 'BTC-USD'",
+          "rawSql": "SELECT timestamp time, symbol, price as priceBtc\n, avg(price) over (PARTITION BY symbol ORDER BY timestamp RANGE between 30 seconds PRECEDING AND CURRENT ROW) movingAvg30Sec\n, avg(price) over (PARTITION BY symbol ORDER BY timestamp RANGE between 45 seconds PRECEDING AND CURRENT ROW) movingAvg45Sec\nFROM ((\n  select timestamp, symbol, avg(price) price from trades\n  WHERE $__timeFilter(timestamp) AND symbol = 'BTC-USD'\n  SAMPLE by 1s\n  order by 1\n)timestamp(timestamp));",
           "refId": "A",
           "sql": {
             "columns": [
