@@ -1,8 +1,8 @@
-QDB_CLIENT_PG_HOST=host.docker.internal
-QDB_CLIENT_PG_PORT=8812
-QDB_CLIENT_PG_USER=admin
-QDB_CLIENT_PG_PASSWORD=quest
+QDB_CLIENT_HOST=host.docker.internal
+QDB_CLIENT_PORT=8812
+QDB_CLIENT_USER=admin
+QDB_CLIENT_PASSWORD=quest
 
 # use the value "disable" for local installations, and "require" for QuestDB Cloud
-QDB_SSL_PG_MODE=disable
+QDB_SSL_MODE=disable
 

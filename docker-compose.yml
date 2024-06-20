@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   questdb:
-    image: questdb/questdb
+    image: questdb/questdb:latest
     container_name: rta_questdb
     restart: always
     ports:
@@ -30,12 +30,13 @@ services:
       - ./dashboard/grafana/home_dir/var_lib_grafana:/var/lib/grafana/
       - ./dashboard/grafana/home_dir/etc_grafana:/etc/grafana/
     environment:
-      - QDB_CLIENT_PG_HOST=${QDB_CLIENT_PG_HOST:-host.docker.internal}
-      - QDB_CLIENT_PG_PORT=${QDB_CLIENT_PG_PORT:-8812}
-      - QDB_CLIENT_PG_USER=${QDB_CLIENT_PG_USER:-admin}
-      - QDB_CLIENT_PG_PASSWORD=${QDB_CLIENT_PG_PASSWORD:-quest}
+      - GF_INSTALL_PLUGINS=questdb-questdb-datasource
+      - QDB_CLIENT_HOST=${QDB_CLIENT_HOST:-host.docker.internal}
+      - QDB_CLIENT_PORT=${QDB_CLIENT_PORT:-8812}
+      - QDB_CLIENT_USER=${QDB_CLIENT_USER:-admin}
+      - QDB_CLIENT_PASSWORD=${QDB_CLIENT_PASSWORD:-quest}
       # use the value "disable" for local installations, and "require" for QuestDB Cloud
-      - QDB_SSL_PG_MODE=${QDB_SSL_PG_MODE:-disable}
+      - QDB_SSL_MODE=${QDB_SSL_MODE:-disable}
 
   jupyter-notebook:
     image:    jupyter/scipy-notebook
@@ -227,5 +228,6 @@ services:
       - ./monitoring/telegraf/kafka_and_questdb_telegraf.conf:/etc/telegraf/telegraf.conf:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
 
 

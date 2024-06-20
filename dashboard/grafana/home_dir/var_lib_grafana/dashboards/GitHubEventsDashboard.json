@@ -22,56 +22,95 @@
   "liveNow": false,
   "panels": [
     {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
       "datasource": {
-        "type": "postgres",
+        "type": "questdb-questdb-datasource",
         "uid": "P0F15568B0DD880D0"
       },
-      "fill": 1,
-      "fillGradient": 0,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
         "y": 0
       },
-      "hiddenSeries": false,
       "id": 1,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
       "options": {
-        "alertThreshold": true
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "multi",
+          "sort": "none"
+        }
       },
-      "percentage": false,
       "pluginVersion": "10.2.2",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
       "targets": [
         {
           "datasource": "qdb",
           "editorMode": "code",
-          "format": "time_series",
+          "format": 1,
           "rawQuery": true,
           "rawSql": "SELECT timestamp AS time, count(*) FROM github_events WHERE\n  $__timeFilter(timestamp) GROUP BY timestamp  ORDER BY timestamp;",
           "refId": "A",
+          "selectedFormat": 2,
           "sql": {
             "columns": [
               {
@@ -91,39 +130,12 @@
           }
         }
       ],
-      "thresholds": [],
-      "timeRegions": [],
       "title": "Total Number of Events Over Time",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "mode": "time",
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "logBase": 1,
-          "show": true
-        },
-        {
-          "format": "short",
-          "logBase": 1,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false
-      }
+      "type": "timeseries"
     },
     {
       "datasource": {
-        "type": "postgres",
+        "type": "questdb-questdb-datasource",
         "uid": "P0F15568B0DD880D0"
       },
       "fieldConfig": {
@@ -164,6 +176,7 @@
           "values": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -172,10 +185,11 @@
         {
           "datasource": "qdb",
           "editorMode": "code",
-          "format": "table",
+          "format": 1,
           "rawQuery": true,
           "rawSql": "SELECT type, count(*) as total FROM github_events WHERE\n  $__timeFilter(timestamp) GROUP BY type;",
           "refId": "A",
+          "selectedFormat": 2,
           "sql": {
             "columns": [
               {
@@ -200,7 +214,7 @@
     },
     {
       "datasource": {
-        "type": "postgres",
+        "type": "questdb-questdb-datasource",
         "uid": "P0F15568B0DD880D0"
       },
       "fieldConfig": {
@@ -231,6 +245,7 @@
       "id": 3,
       "options": {
         "displayMode": "lcd",
+        "maxVizHeight": 300,
         "minVizHeight": 10,
         "minVizWidth": 0,
         "namePlacement": "auto",
@@ -243,9 +258,10 @@
           "values": true
         },
         "showUnfilled": true,
+        "sizing": "auto",
         "valueMode": "color"
       },
-      "pluginVersion": "10.2.2",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -253,10 +269,11 @@
             "uid": "${DS_QDB}"
           },
           "editorMode": "code",
-          "format": "table",
+          "format": 1,
           "rawQuery": true,
           "rawSql": "SELECT repo, count(*) as total FROM github_events WHERE\n  $__timeFilter(timestamp) GROUP BY repo order by total desc limit 10;",
           "refId": "A",
+          "selectedFormat": 2,
           "sql": {
             "columns": [
               {
@@ -281,7 +298,7 @@
     },
     {
       "datasource": {
-        "type": "postgres",
+        "type": "questdb-questdb-datasource",
         "uid": "P0F15568B0DD880D0"
       },
       "fieldConfig": {
@@ -312,6 +329,7 @@
       "id": 4,
       "options": {
         "displayMode": "lcd",
+        "maxVizHeight": 300,
         "minVizHeight": 10,
         "minVizWidth": 0,
         "namePlacement": "auto",
@@ -324,9 +342,10 @@
           "values": true
         },
         "showUnfilled": true,
+        "sizing": "auto",
         "valueMode": "color"
       },
-      "pluginVersion": "10.2.2",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -334,10 +353,11 @@
             "uid": "${DS_QDB}"
           },
           "editorMode": "code",
-          "format": "table",
+          "format": 1,
           "rawQuery": true,
           "rawSql": "SELECT actor, count(*) as total FROM github_events WHERE\n  $__timeFilter(timestamp) GROUP BY actor ORDER BY total DESC LIMIT 10;",
           "refId": "A",
+          "selectedFormat": 2,
           "sql": {
             "columns": [
               {
@@ -362,7 +382,7 @@
     },
     {
       "datasource": {
-        "type": "postgres",
+        "type": "questdb-questdb-datasource",
         "uid": "P0F15568B0DD880D0"
       },
       "fieldConfig": {
@@ -425,7 +445,9 @@
         },
         "showValue": "never",
         "tooltip": {
-          "show": false,
+          "maxHeight": 600,
+          "mode": "none",
+          "showColorScale": false,
           "yHistogram": false
         },
         "yAxis": {
@@ -433,7 +455,7 @@
           "reverse": false
         }
       },
-      "pluginVersion": "10.2.2",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -441,10 +463,11 @@
             "uid": "P0F15568B0DD880D0"
           },
           "editorMode": "code",
-          "format": "time_series",
+          "format": 1,
           "rawQuery": true,
           "rawSql": "SELECT timestamp as time, type, count(*) as total FROM github_events \nWHERE\n  $__timeFilter(timestamp)\nsample by 15s;",
           "refId": "A",
+          "selectedFormat": 2,
           "sql": {
             "columns": [
               {
@@ -469,7 +492,7 @@
     }
   ],
   "refresh": "5s",
-  "schemaVersion": 38,
+  "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": []
@@ -478,6 +501,7 @@
     "from": "now-5m",
     "to": "now"
   },
+  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {
     "refresh_intervals": [
       "5s",

@@ -22,7 +22,10 @@
   "liveNow": true,
   "panels": [
     {
-      "datasource": {},
+      "datasource": {
+        "type": "questdb-questdb-datasource",
+        "uid": "P0F15568B0DD880D0"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -64,7 +67,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.2",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -72,10 +75,11 @@
             "uid": "${DS_QDB}"
           },
           "editorMode": "code",
-          "format": "table",
+          "format": 1,
           "rawQuery": true,
           "rawSql": "WITH in_interval AS (\nSELECT count(*) as events_in_interval,\ncount_distinct(device_id) as devices_in_interval\nFROM smart_meters\nWHERE\n  $__timeFilter(timestamp)\n  ), absolute_total AS (\n  SELECT count(*) as total_events,\n  count_distinct(device_id) as total_devices\nFROM smart_meters\n  )\n  select events_in_interval, total_events, devices_in_interval, total_devices from in_interval cross join absolute_total",
           "refId": "A",
+          "selectedFormat": 2,
           "sql": {
             "columns": [
               {
@@ -100,7 +104,7 @@
     },
     {
       "datasource": {
-        "type": "postgres",
+        "type": "questdb-questdb-datasource",
         "uid": "P0F15568B0DD880D0"
       },
       "fieldConfig": {
@@ -172,6 +176,7 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -184,10 +189,11 @@
             "uid": "${DS_QDB}"
           },
           "editorMode": "code",
-          "format": "table",
+          "format": 1,
           "rawQuery": true,
           "rawSql": "SELECT timestamp, count()\nfrom smart_meters where $__timeFilter(timestamp) \nand timestamp < timestamp_floor('s', now())\nsample by 10s\nlimit 600",
           "refId": "A",
+          "selectedFormat": 2,
           "sql": {
             "columns": [
               {
@@ -211,7 +217,10 @@
       "type": "timeseries"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "questdb-questdb-datasource",
+        "uid": "P0F15568B0DD880D0"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -288,6 +297,7 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -300,10 +310,11 @@
             "uid": "${DS_QDB}"
           },
           "editorMode": "code",
-          "format": "table",
+          "format": 1,
           "rawQuery": true,
           "rawSql": "SELECT timestamp, avg(energy_consumption) as avg_consumption, max(energy_consumption) as max_consumption, min(energy_consumption) as min_consumption\nfrom smart_meters where $__timeFilter(timestamp) \nsample by 1s\n",
           "refId": "A",
+          "selectedFormat": 2,
           "sql": {
             "columns": [
               {
@@ -327,7 +338,10 @@
       "type": "timeseries"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "questdb-questdb-datasource",
+        "uid": "P0F15568B0DD880D0"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -400,6 +414,7 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -411,10 +426,11 @@
             "uid": "${DS_QDB}"
           },
           "editorMode": "code",
-          "format": "table",
+          "format": 1,
           "rawQuery": true,
           "rawSql": "SELECT timestamp, avg(power_factor) as avg_power_factor, max(power_factor) as max_power_factor, min(power_factor) as min_power_factor\nfrom smart_meters where $__timeFilter(timestamp) \nsample by 1s\n",
           "refId": "A",
+          "selectedFormat": 2,
           "sql": {
             "columns": [
               {
@@ -439,7 +455,7 @@
     },
     {
       "datasource": {
-        "type": "postgres",
+        "type": "questdb-questdb-datasource",
         "uid": "P0F15568B0DD880D0"
       },
       "fieldConfig": {
@@ -490,7 +506,7 @@
         },
         "showHeader": true
       },
-      "pluginVersion": "10.2.2",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -498,10 +514,11 @@
             "uid": "${DS_QDB}"
           },
           "editorMode": "code",
-          "format": "table",
+          "format": 1,
           "rawQuery": true,
           "rawSql": "SELECT *\nfrom smart_meters where $__timeFilter(timestamp) \nlimit -10\n",
           "refId": "A",
+          "selectedFormat": 2,
           "sql": {
             "columns": [
               {
@@ -525,7 +542,10 @@
       "type": "table"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "questdb-questdb-datasource",
+        "uid": "P0F15568B0DD880D0"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -625,7 +645,7 @@
           }
         ]
       },
-      "pluginVersion": "10.2.2",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -633,10 +653,11 @@
             "uid": "${DS_QDB}"
           },
           "editorMode": "code",
-          "format": "table",
+          "format": 1,
           "rawQuery": true,
           "rawSql": "SELECT timestamp,  \nSUM(CASE WHEN status='Active' THEN 1 ELSE 0 END) as Active, \nSUM(CASE WHEN status='Inactive' THEN 1 ELSE 0 END) as Inactive,\nSUM(CASE WHEN status='Faulty' THEN 1 ELSE 0 END) as Faulty,\ncount() as total\nfrom smart_meters where $__timeFilter(timestamp) \nsample by 30s\norder by timestamp desc\nlimit 8\n",
           "refId": "A",
+          "selectedFormat": 2,
           "sql": {
             "columns": [
               {
@@ -660,7 +681,10 @@
       "type": "table"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "questdb-questdb-datasource",
+        "uid": "P0F15568B0DD880D0"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -733,6 +757,7 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "asc"
         }
@@ -745,10 +770,11 @@
             "uid": "${DS_QDB}"
           },
           "editorMode": "code",
-          "format": "table",
+          "format": 1,
           "rawQuery": true,
           "rawSql": "SELECT timestamp,device_id, avg(energy_consumption) as avg_consumption\nfrom smart_meters where $__timeFilter(timestamp) and device_id IN ('AAA0000', 'AAA0010')\nsample by 1s\n",
           "refId": "A",
+          "selectedFormat": 2,
           "sql": {
             "columns": [
               {
@@ -781,15 +807,16 @@
     }
   ],
   "refresh": "1s",
-  "schemaVersion": 38,
+  "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": []
   },
   "time": {
-    "from": "now-15m",
+    "from": "now-5m",
     "to": "now-0m"
   },
+  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {
     "nowDelay": "0m",
     "refresh_intervals": [

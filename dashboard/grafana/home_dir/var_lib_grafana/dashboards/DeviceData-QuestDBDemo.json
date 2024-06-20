@@ -42,7 +42,10 @@
       "type": "row"
     },
     {
-      "datasource": "qdb",
+      "datasource": {
+        "type": "questdb-questdb-datasource",
+        "uid": "P0F15568B0DD880D0"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -115,6 +118,7 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -122,7 +126,7 @@
       "targets": [
         {
           "datasource": "qdb",
-          "format": "time_series",
+          "format": 1,
           "group": [],
           "metricColumn": "measure1",
           "rawQuery": true,
@@ -150,6 +154,7 @@
               }
             ]
           ],
+          "selectedFormat": 2,
           "table": "iot_data",
           "timeColumn": "timestamp",
           "where": [
@@ -165,7 +170,10 @@
       "type": "timeseries"
     },
     {
-      "datasource": "qdb",
+      "datasource": {
+        "type": "questdb-questdb-datasource",
+        "uid": "P0F15568B0DD880D0"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -238,6 +246,7 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -245,7 +254,7 @@
       "targets": [
         {
           "datasource": "qdb",
-          "format": "time_series",
+          "format": 1,
           "group": [],
           "metricColumn": "measure1",
           "rawQuery": true,
@@ -273,6 +282,7 @@
               }
             ]
           ],
+          "selectedFormat": 2,
           "table": "iot_data",
           "timeColumn": "timestamp",
           "where": [
@@ -301,7 +311,10 @@
       "type": "row"
     },
     {
-      "datasource": "qdb",
+      "datasource": {
+        "type": "questdb-questdb-datasource",
+        "uid": "P0F15568B0DD880D0"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -350,11 +363,11 @@
         },
         "showHeader": true
       },
-      "pluginVersion": "10.2.2",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": "qdb",
-          "format": "table",
+          "format": 1,
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
@@ -370,6 +383,7 @@
               }
             ]
           ],
+          "selectedFormat": 2,
           "table": "iot_data",
           "timeColumn": "time",
           "where": [
@@ -385,7 +399,10 @@
       "type": "table"
     },
     {
-      "datasource": "qdb",
+      "datasource": {
+        "type": "questdb-questdb-datasource",
+        "uid": "P0F15568B0DD880D0"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -427,14 +444,15 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.2",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": "qdb",
-          "format": "table",
+          "format": 1,
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
@@ -450,6 +468,7 @@
               }
             ]
           ],
+          "selectedFormat": 2,
           "timeColumn": "time",
           "where": [
             {
@@ -464,7 +483,10 @@
       "type": "stat"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "questdb-questdb-datasource",
+        "uid": "P0F15568B0DD880D0"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -598,11 +620,11 @@
           "zoom": 1.9
         }
       },
-      "pluginVersion": "10.2.2",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": "qdb",
-          "format": "table",
+          "format": 1,
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
@@ -618,6 +640,7 @@
               }
             ]
           ],
+          "selectedFormat": 2,
           "timeColumn": "time",
           "where": [
             {
@@ -633,7 +656,7 @@
     },
     {
       "datasource": {
-        "type": "postgres",
+        "type": "questdb-questdb-datasource",
         "uid": "P0F15568B0DD880D0"
       },
       "fieldConfig": {
@@ -677,13 +700,14 @@
           "values": false
         },
         "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "showThresholdMarkers": true,
+        "sizing": "auto"
       },
-      "pluginVersion": "10.2.2",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": "qdb",
-          "format": "table",
+          "format": 1,
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
@@ -699,6 +723,7 @@
               }
             ]
           ],
+          "selectedFormat": 2,
           "timeColumn": "time",
           "where": [
             {
@@ -714,15 +739,16 @@
     }
   ],
   "refresh": "500s",
-  "schemaVersion": 38,
+  "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": []
   },
   "time": {
-    "from": "now-5s",
+    "from": "now-5m",
     "to": "now"
   },
+  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {
     "refresh_intervals": [
       "100ms",

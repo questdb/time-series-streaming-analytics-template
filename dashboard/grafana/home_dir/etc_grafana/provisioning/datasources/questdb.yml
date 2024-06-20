@@ -7,18 +7,20 @@ deleteDatasources:
 
 datasources:
   - name: qdb
-    type: postgres
-    url: ${QDB_CLIENT_PG_HOST}:${QDB_CLIENT_PG_PORT}
-    database: qdb
+    type: questdb-questdb-datasource
+    url: ${QDB_CLIENT_HOST}:${QDB_CLIENT_PORT}
+    uid: P0F15568B0DD880D0
     isDefault: true
-    user: ${QDB_CLIENT_PG_USER}
     secureJsonData:
-      password: ${QDB_CLIENT_PG_PASSWORD}
+      password: ${QDB_CLIENT_PASSWORD}
     jsonData:
-      sslmode: ${QDB_SSL_PG_MODE} # disable/require/verify-ca/verify-full
-      maxOpenConns: 0         # Grafana v5.4+
-      maxIdleConns: 2         # Grafana v5.4+
-      connMaxLifetime: 14400  # Grafana v5.4+
-      postgresVersion: 903 # 903=9.3, 904=9.4, 905=9.5, 906=9.6, 1000=10
-      timescaledb: false
+      server: ${QDB_CLIENT_HOST}
+      port: ${QDB_CLIENT_PORT}
+      username: ${QDB_CLIENT_USER}
+      tlsMode: ${QDB_SSL_MODE} # disable/require/verify-ca/verify-full
+      # timeout: <seconds>
+      # queryTimeout: <seconds>
+      maxOpenConnections: 100
+      maxIdleConnections: 100
+      maxConnectionLifetime: 14400
 

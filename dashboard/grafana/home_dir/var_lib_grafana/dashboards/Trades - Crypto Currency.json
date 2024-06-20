@@ -24,7 +24,7 @@
   "panels": [
     {
       "datasource": {
-        "type": "postgres",
+        "type": "questdb-questdb-datasource",
         "uid": "P0F15568B0DD880D0"
       },
       "description": "Real-time buy and sell orders from Coinbase, covering exchanges amongst 20+ assets.",
@@ -293,7 +293,7 @@
           }
         ]
       },
-      "pluginVersion": "10.2.2",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -301,10 +301,11 @@
             "uid": "P0F15568B0DD880D0"
           },
           "editorMode": "code",
-          "format": "table",
+          "format": 1,
           "rawQuery": true,
           "rawSql": "SELECT timestamp, \nleft(symbol,strpos(symbol,'-')-1) asset,\nright(symbol,length(symbol)-strpos(symbol,'-')) counter,\ncase when side = 'buy' then amount else -amount end quantity, \ncase when side = 'buy' then -amount*price else amount*price end consideration,\ncase when (now()-timestamp)/1000000<0.3 then 'x' else '' end new\nfrom trades where $__timeFilter(timestamp) order by timestamp desc\nlimit 50",
           "refId": "A",
+          "selectedFormat": 1,
           "sql": {
             "columns": [
               {
@@ -331,7 +332,7 @@
     },
     {
       "datasource": {
-        "type": "postgres",
+        "type": "questdb-questdb-datasource",
         "uid": "P0F15568B0DD880D0"
       },
       "description": "Filled exchange orders between 20+ crypto assets, with USD notional along the y-axis. Positive values are buy orders, negative are sell orders.",
@@ -402,6 +403,7 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -413,10 +415,11 @@
             "uid": "P0F15568B0DD880D0"
           },
           "editorMode": "code",
-          "format": "table",
+          "format": 0,
           "rawQuery": true,
-          "rawSql": "select timestamp time, left(symbol,strpos(symbol,'-')-1) asset, sum(abs(amount)) from \ntrades where $__timeFilter(timestamp) and \nright(symbol,length(symbol)-strpos(symbol,'-'))= 'USD'\nsample by 5s\norder by asset, time\n",
+          "rawSql": "select timestamp time, left(symbol,strpos(symbol,'-')-1) asset, sum(abs(amount)) from \ntrades where $__timeFilter(timestamp) and \nright(symbol,length(symbol)-strpos(symbol,'-'))= 'USD'\nsample by 5s\norder by time, asset\n",
           "refId": "A",
+          "selectedFormat": 0,
           "sql": {
             "columns": [
               {
@@ -488,7 +491,7 @@
     },
     {
       "datasource": {
-        "type": "postgres",
+        "type": "questdb-questdb-datasource",
         "uid": "P0F15568B0DD880D0"
       },
       "description": "Trade volume (USD notional) distribution per asset for the past 5 minutes.",
@@ -540,6 +543,7 @@
         "rowHeight": 0.81,
         "showValue": "never",
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -551,10 +555,11 @@
             "uid": "P0F15568B0DD880D0"
           },
           "editorMode": "code",
-          "format": "table",
+          "format": 0,
           "rawQuery": true,
-          "rawSql": "select timestamp time, left(symbol,strpos(symbol,'-')-1) asset, sum(abs(amount)) from \ntrades where $__timeFilter(timestamp) and \nright(symbol,length(symbol)-strpos(symbol,'-'))= 'USD'\nsample by 5s\norder by asset, time\n",
+          "rawSql": "select timestamp time, left(symbol,strpos(symbol,'-')-1) asset, sum(abs(amount)) from \ntrades where $__timeFilter(timestamp) and \nright(symbol,length(symbol)-strpos(symbol,'-'))= 'USD'\nsample by 5s\norder by time, asset\n",
           "refId": "A",
+          "selectedFormat": 0,
           "sql": {
             "columns": [
               {
@@ -604,7 +609,7 @@
     },
     {
       "datasource": {
-        "type": "postgres",
+        "type": "questdb-questdb-datasource",
         "uid": "P0F15568B0DD880D0"
       },
       "description": "Moving averages on the USD price of Bitcoin in the past 5 minutes, over 10-, 30-, and 45-second windows.",
@@ -746,6 +751,7 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -758,10 +764,11 @@
             "uid": "P0F15568B0DD880D0"
           },
           "editorMode": "code",
-          "format": "table",
+          "format": 1,
           "rawQuery": true,
           "rawSql": "SELECT timestamp time, symbol, price as priceBtc\n, avg(price) over (PARTITION BY symbol ORDER BY timestamp RANGE between 30 seconds PRECEDING AND CURRENT ROW) movingAvg30Sec\n, avg(price) over (PARTITION BY symbol ORDER BY timestamp RANGE between 45 seconds PRECEDING AND CURRENT ROW) movingAvg45Sec\nFROM ((\n  select timestamp, symbol, avg(price) price from trades\n  WHERE $__timeFilter(timestamp) AND symbol = 'BTC-USD'\n  SAMPLE by 1s\n  order by 1\n)timestamp(timestamp));",
           "refId": "A",
+          "selectedFormat": 2,
           "sql": {
             "columns": [
               {
@@ -793,7 +800,7 @@
     },
     {
       "datasource": {
-        "type": "postgres",
+        "type": "questdb-questdb-datasource",
         "uid": "P0F15568B0DD880D0"
       },
       "description": "An OHLC (Open, High, Low, Close) chart for the notional price in USD of Bitcoin, sampled every second over the past 5 minutes.",
@@ -892,10 +899,11 @@
             "uid": "P0F15568B0DD880D0"
           },
           "editorMode": "code",
-          "format": "table",
+          "format": 1,
           "rawQuery": true,
           "rawSql": "SELECT timestamp as time, first(price) as open, last(price) as close, min(price) as lo, max(price) as hi, sum(amount) as vol\nFROM trades\nWHERE symbol = 'BTC-USD' and $__timeFilter(timestamp) \nSAMPLE BY 1s ALIGN TO CALENDAR",
           "refId": "A",
+          "selectedFormat": 2,
           "sql": {
             "columns": [
               {
@@ -921,7 +929,7 @@
     },
     {
       "datasource": {
-        "type": "postgres",
+        "type": "questdb-questdb-datasource",
         "uid": "P0F15568B0DD880D0"
       },
       "description": "Calculation of the Pearson correlation coefficient (ρ) between the prices of Ethereum and Bitcoin. Data is sampled every minute over the past 12 hours, and correlation is calculated over hour- and day-long windows.",
@@ -1027,6 +1035,7 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -1038,10 +1047,11 @@
             "uid": "P0F15568B0DD880D0"
           },
           "editorMode": "code",
-          "format": "table",
+          "format": 1,
           "rawQuery": true,
           "rawSql": "WITH data as (\nWITH \nBTCUSD as (select timestamp, price from trades where $__timeFilter(timestamp) and symbol = 'BTC-USD' ),\nETHUSD as (select timestamp, price from trades where $__timeFilter(timestamp) and symbol = 'ETH-USD' )\nSELECT BTCUSD.timestamp, corr(BTCUSD.price,ETHUSD.price) from BTCUSD asof join ETHUSD sample by 10s)\nSELECT timestamp\n, avg(corr) over(ORDER BY timestamp range between 1 minute preceding and current row) hourly_corr_rolling\n, avg(corr) over(ORDER BY timestamp range between 5 minute preceding and current row) daily_corr_rolling\nfrom data",
           "refId": "A",
+          "selectedFormat": 2,
           "sql": {
             "columns": [
               {
@@ -1067,7 +1077,7 @@
     }
   ],
   "refresh": "250ms",
-  "schemaVersion": 38,
+  "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": []
@@ -1076,6 +1086,7 @@
     "from": "now-5m",
     "to": "now"
   },
+  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {
     "refresh_intervals": [
       "250ms",
