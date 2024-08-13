@@ -28,7 +28,11 @@ This is the recommended way to start all the components, as they will have all d
 
 From the root directory of this repository, execute:
 
-`docker-compose up`
+`docker-compose --profile connect up`
+
+Or, for running ingestion using benthos/RedPanda Connect:
+
+`docker-compose --profile benthos up`
 
 This might take a few moments, as it needs to download several docker images and initialize them. For reference, a cold
 start on my laptop over a wired connection it takes between 30 seconds and 1 minute. Subsequent starts should be way
@@ -529,5 +533,3 @@ folders. You can remove the local data like this
 
 ## Starting and configuring components individually
 TODO
-
-

@@ -1,0 +1,68 @@
+http:
+  enabled: true
+  address: 0.0.0.0:4195
+  root_path: /benthos
+  debug_endpoints: true
+  cert_file: ""
+  key_file: ""
+  cors:
+    enabled: false
+    allowed_origins: []
+  basic_auth:
+    enabled: false
+    realm: restricted
+    username: ""
+    password_hash: ""
+    algorithm: sha256
+    salt: ""
+input:
+  kafka:
+    addresses: ["broker:29092"]
+    topics: ["trades"]
+    consumer_group: benthos
+buffer:
+  none: {}
+pipeline:
+  threads: -1
+  processors:
+    - schema_registry_decode:
+        url: "http://schema_registry:8081"
+output:
+  questdb:
+    address: "questdb:9000"
+    table: trades
+    symbols:
+      - symbol
+      - side
+    designatedTimestampField: timestamp
+    max_in_flight: 64
+    batching:
+      count: 1000
+      period: 2s
+
+input_resources: []
+processor_resources: []
+output_resources: []
+cache_resources: []
+rate_limit_resources: []
+logger:
+  level: DEBUG
+  format: logfmt
+  add_timestamp: false
+  level_name: level
+  timestamp_name: time
+  message_name: msg
+  static_fields:
+    '@service': benthos
+  file:
+    path: ""
+    rotate: false
+    rotate_max_age_days: 0
+metrics:
+  prometheus: {}
+  mapping: ""
+tracer:
+  none: {}
+shutdown_delay: 0s
+shutdown_timeout: 20s
+tests: []

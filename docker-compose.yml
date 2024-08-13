@@ -217,6 +217,7 @@ services:
       }'
 
       sleep infinity
+    profiles: [connect]
 
   telegraf:
     image: telegraf
@@ -228,6 +229,16 @@ services:
       - ./monitoring/telegraf/kafka_and_questdb_telegraf.conf:/etc/telegraf/telegraf.conf:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
-
-
+  benthos:
+    image: sklarsa/qdb-benthos:0.0.1
+    command:
+      - run
+      - ./benthos-conf.yaml
+    container_name: rta_benthos
+    depends_on:
+      - questdb
+      - broker
+      - schema_registry
+    volumes:
+      - ./benthos-conf.yaml:/app/benthos-conf.yaml
+    profiles: [benthos]
