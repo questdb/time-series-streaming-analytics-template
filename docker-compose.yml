@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   questdb:
-    image: questdb/questdb:latest
+    image: questdb/questdb:8.1.1
     container_name: rta_questdb
     restart: always
     ports:
@@ -18,7 +18,7 @@ services:
       - ./questdb/questdb_root:/var/lib/questdb/
 
   grafana:
-    image: grafana/grafana-oss
+    image: grafana/grafana-oss:11.2.0
     container_name: rta_grafana
     restart: always
     user: "${DOCKER_COMPOSE_USER_ID:-}"
@@ -58,7 +58,7 @@ services:
       - GITHUB_TOKEN=${GITHUB_TOKEN}
 
   broker:
-    image: confluentinc/cp-kafka:7.5.3
+    image: confluentinc/cp-kafka:7.7.0
     hostname: broker
     container_name: rta_kafka_broker
     ports:
@@ -91,7 +91,7 @@ services:
       CLUSTER_ID: 'QTkwRDkzMDg3QTdFNDJCRU'
 
   schema_registry:
-    image: confluentinc/cp-schema-registry:7.2.1
+    image: confluentinc/cp-schema-registry:7.7.0
     hostname: schema_registry
     container_name: rta_schema_registry
     depends_on:
@@ -107,7 +107,7 @@ services:
       SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: 'GET,POST,PUT,OPTIONS'
 
   kafka-connect:
-    image: confluentinc/cp-kafka-connect:7.5.3
+    image: confluentinc/cp-kafka-connect:7.7.0
     hostname: kafka-connect
     container_name: rta_kafka_connect
     depends_on:
