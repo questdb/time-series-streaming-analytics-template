@@ -1,7 +1,6 @@
 apiVersion: 1
 
 apps:
-  # <string> the type of app, plugin identifier. Required
   - type: questdb-questdb-datasource
     disabled: false
 
