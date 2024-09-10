@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   questdb:
     image: questdb/questdb:8.1.1
@@ -14,8 +12,9 @@ services:
       - "host.docker.internal:host-gateway"
     environment:
       - QDB_METRICS_ENABLED=TRUE
+      - QDB_LINE_TCP_WRITER_WORKER_COUNT=1
     volumes:
-      - ./questdb/questdb_root:/var/lib/questdb/
+      - ./questdb/questdb_root:/var/lib/questdb/:rw
 
   grafana:
     image: grafana/grafana-oss:11.2.0
@@ -27,8 +26,8 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - ./dashboard/grafana/home_dir/var_lib_grafana:/var/lib/grafana/
-      - ./dashboard/grafana/home_dir/etc_grafana:/etc/grafana/
+      - ./dashboard/grafana/home_dir/var_lib_grafana:/var/lib/grafana/:rw
+      - ./dashboard/grafana/home_dir/etc_grafana:/etc/grafana/:rw
     environment:
       - GF_INSTALL_PLUGINS=questdb-questdb-datasource
       - QDB_CLIENT_HOST=${QDB_CLIENT_HOST:-host.docker.internal}
@@ -42,8 +41,8 @@ services:
     image:    jupyter/scipy-notebook
     container_name: rta_jupyter
     volumes:
-      - ./notebooks:/home/jovyan
-      - ./ingestion/python:/home/ingestion
+      - ./notebooks:/home/jovyan:rw
+      - ./ingestion/python:/home/ingestion:rw
     ports:
       - 8888:8888
     command: sh -c "pip install questdb psycopg[binary] psycopg2-binary PyGithub kafka-python confluent-kafka \"confluent-kafka[avro]\" fastavro requests && start-notebook.sh --NotebookApp.password= --NotebookApp.token="

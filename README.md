@@ -34,6 +34,13 @@ This might take a few moments, as it needs to download several docker images and
 start on my laptop over a wired connection it takes between 30 seconds and 1 minute. Subsequent starts should be way
 faster. The downloaded images will use about 1Gb on your disk.
 
+If you notice any permissions error on the logs (typically Grafana complaining a folder is not writable), this is probably due to your system running docker
+as root. You can fix this by setting the following env variable:
+
+```
+export DOCKER_COMPOSE_USER_ID=$(id -u)
+```
+
 After a few moments, you should see the logs stabilize and stop scrolling fast. There will always be some activity, as the stack collects and store some metrics, but those appear only every few seconds. At that point the project is fully available.
 
 ```mermaid
