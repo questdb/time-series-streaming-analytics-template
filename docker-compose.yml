@@ -54,7 +54,7 @@ services:
     environment:
       - RESTARTABLE=yes
       - DOCKER_STACKS_JUPYTER_CMD=notebook
-      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
       - QUESTDB_HTTP_ENDPOINT=${QUESTDB_HTTP_ENDPOINT:-host.docker.internal:9000}
 
 
