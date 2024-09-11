@@ -162,7 +162,7 @@ services:
       curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/questdb-iot/config -d '{
       "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
           "topics": "iot_data",
-          "client.conf.string": "http::addr=${QUESTDB_HTTP_ENDPOINT};",
+          "client.conf.string": "http::addr=${QUESTDB_HTTP_ENDPOINT:-host.docker.internal:9000};",
           "name": "questdb-iot",
           "value.converter": "org.apache.kafka.connect.json.JsonConverter",
           "include.key": false,
@@ -175,7 +175,7 @@ services:
       curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/questdb-github/config -d '{
       "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
           "topics": "github_events",
-          "client.conf.string": "http::addr=${QUESTDB_HTTP_ENDPOINT};",
+          "client.conf.string": "http::addr=${QUESTDB_HTTP_ENDPOINT:-host.docker.internal:9000};",
           "name": "questdb-github",
           "value.converter": "org.apache.kafka.connect.json.JsonConverter",
           "include.key": false,
@@ -189,7 +189,7 @@ services:
       curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/questdb-trades/config -d '{
       "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
           "topics": "trades",
-          "client.conf.string": "http::addr=${QUESTDB_HTTP_ENDPOINT};",
+          "client.conf.string": "http::addr=${QUESTDB_HTTP_ENDPOINT:-host.docker.internal:9000};",
           "name": "questdb-trades",
           "value.converter": "io.confluent.connect.avro.AvroConverter",
           "value.converter.schema.registry.url": "http://schema_registry:8081",
@@ -205,7 +205,7 @@ services:
       curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/questdb-smart-meters/config -d '{
       "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
           "topics": "smart-meters",
-          "client.conf.string": "http::addr=${QUESTDB_HTTP_ENDPOINT};",
+          "client.conf.string": "http::addr=${QUESTDB_HTTP_ENDPOINT:-host.docker.internal:9000};",
           "name": "questdb-smart-meters",
           "value.converter": "io.confluent.connect.avro.AvroConverter",
           "value.converter.schema.registry.url": "http://schema_registry:8081",
