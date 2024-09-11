@@ -590,7 +590,7 @@
         "type": "table"
       }
     ],
-    "refresh": "500ms",
+    "refresh": "1s",
     "schemaVersion": 39,
     "tags": [],
     "templating": {
