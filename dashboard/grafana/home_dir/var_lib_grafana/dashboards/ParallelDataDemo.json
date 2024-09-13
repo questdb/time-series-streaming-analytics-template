@@ -348,8 +348,8 @@
           },
           "showPercentChange": false,
           "text": {
-            "titleSize": 50,
-            "valueSize": 100
+            "titleSize": 30,
+            "valueSize": 30
           },
           "textMode": "auto",
           "wideLayout": true
