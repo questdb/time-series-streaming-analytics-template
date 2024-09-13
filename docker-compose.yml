@@ -231,8 +231,8 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      - QUESTDB_METRICS_URL=${QUESTDB_METRICS_URL:-host.docker.internal:9003}
-      - QUESTDB_HTTP_URL=${QUESTDB_HTTP_URL:-host.docker.internal:9000}
+      - QUESTDB_METRICS_URL=${QUESTDB_METRICS_URL:-http://host.docker.internal:9003}
+      - QUESTDB_HTTP_URL=${QUESTDB_HTTP_URL:-http://host.docker.internal:9000}
       - QUESTDB_HTTP_TOKEN=${QUESTDB_HTTP_TOKEN:-}
       - QUESTDB_SKIP_TLS_VERIFICATION=${QUESTDB_SKIP_TLS_VERIFICATION:-false}
 
