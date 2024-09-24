@@ -56,6 +56,10 @@ services:
       - DOCKER_STACKS_JUPYTER_CMD=notebook
       - GITHUB_TOKEN=${GITHUB_TOKEN:-}
       - QUESTDB_HTTP_ENDPOINT=${QUESTDB_HTTP_ENDPOINT:-host.docker.internal:9000}
+      - QDB_CLIENT_HOST=${QDB_CLIENT_HOST:-host.docker.internal}
+      - QDB_CLIENT_PORT=${QDB_CLIENT_PORT:-8812}
+      - QDB_CLIENT_USER=${QDB_CLIENT_USER:-admin}
+      - QDB_CLIENT_PASSWORD=${QDB_CLIENT_PASSWORD:-quest}
 
 
   broker:
