@@ -293,7 +293,7 @@
           }
         ]
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "11.2.0",
       "targets": [
         {
           "datasource": {
@@ -332,6 +332,7 @@
     },
     {
       "datasource": {
+        "default": true,
         "type": "questdb-questdb-datasource",
         "uid": "P0F15568B0DD880D0"
       },
@@ -348,6 +349,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "points",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -417,7 +419,7 @@
           "editorMode": "code",
           "format": 0,
           "rawQuery": true,
-          "rawSql": "select timestamp time, left(symbol,strpos(symbol,'-')-1) asset, sum(abs(amount)) from \ntrades where $__timeFilter(timestamp) and \nright(symbol,length(symbol)-strpos(symbol,'-'))= 'USD'\nsample by 5s\norder by time, asset\n",
+          "rawSql": "SELECT timestamp time, symbol,\n  case when side ='buy' then amount*price \n  else -1*amount*price end trade \nfrom trades where $__timeFilter(timestamp) and \nsymbol like '%-USD'",
           "refId": "A",
           "selectedFormat": 0,
           "sql": {
@@ -625,6 +627,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -800,6 +803,7 @@
     },
     {
       "datasource": {
+        "default": true,
         "type": "questdb-questdb-datasource",
         "uid": "P0F15568B0DD880D0"
       },
@@ -816,6 +820,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -870,7 +875,7 @@
       "hideTimeOverride": false,
       "id": 6,
       "options": {
-        "candleStyle": "ohlcbars",
+        "candleStyle": "candles",
         "colorStrategy": "close-close",
         "colors": {
           "down": "light-blue",
@@ -890,7 +895,11 @@
           "placement": "bottom",
           "showLegend": false
         },
-        "mode": "candles+volume"
+        "mode": "candles+volume",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
       },
       "targets": [
         {
@@ -901,7 +910,7 @@
           "editorMode": "code",
           "format": 1,
           "rawQuery": true,
-          "rawSql": "SELECT timestamp as time, first(price) as open, last(price) as close, min(price) as lo, max(price) as hi, sum(amount) as vol\nFROM trades\nWHERE symbol = 'BTC-USD' and $__timeFilter(timestamp) \nSAMPLE BY 1s ALIGN TO CALENDAR",
+          "rawSql": "SELECT timestamp as time, first(price) as open, last(price) as close, min(price) as lo, max(price) as hi, sum(amount) as vol\nFROM trades\nWHERE symbol = 'BTC-USD' and $__timeFilter(timestamp) \nSAMPLE BY 5s ALIGN TO CALENDAR",
           "refId": "A",
           "selectedFormat": 2,
           "sql": {
@@ -929,6 +938,7 @@
     },
     {
       "datasource": {
+        "default": true,
         "type": "questdb-questdb-datasource",
         "uid": "P0F15568B0DD880D0"
       },
@@ -947,6 +957,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -1049,7 +1060,7 @@
           "editorMode": "code",
           "format": 1,
           "rawQuery": true,
-          "rawSql": "WITH data as (\nWITH \nBTCUSD as (select timestamp, price from trades where $__timeFilter(timestamp) and symbol = 'BTC-USD' ),\nETHUSD as (select timestamp, price from trades where $__timeFilter(timestamp) and symbol = 'ETH-USD' )\nSELECT BTCUSD.timestamp, corr(BTCUSD.price,ETHUSD.price) from BTCUSD asof join ETHUSD sample by 10s)\nSELECT timestamp\n, avg(corr) over(ORDER BY timestamp range between 1 minute preceding and current row) hourly_corr_rolling\n, avg(corr) over(ORDER BY timestamp range between 5 minute preceding and current row) daily_corr_rolling\nfrom data",
+          "rawSql": "WITH data as (\nWITH \nBTCUSD as (select timestamp, price from trades where $__timeFilter(timestamp) and symbol = 'BTC-USD' ),\nETHUSD as (select timestamp, price from trades where $__timeFilter(timestamp) and symbol = 'ETH-USD' )\nSELECT BTCUSD.timestamp, corr(BTCUSD.price,ETHUSD.price) from BTCUSD asof join ETHUSD sample by 10s)\nSELECT timestamp\n, avg(corr) over(ORDER BY timestamp range between 1 minute preceding and current row) one_min_corr_rolling\n, avg(corr) over(ORDER BY timestamp range between 5 minute preceding and current row) five_min_corr_rolling\nfrom data",
           "refId": "A",
           "selectedFormat": 2,
           "sql": {
@@ -1086,7 +1097,6 @@
     "from": "now-5m",
     "to": "now"
   },
-  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {
     "refresh_intervals": [
       "250ms",
@@ -1111,6 +1121,6 @@
   "timezone": "",
   "title": "Trades - Crypto Currency",
   "uid": "trades-crypto-currency",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
