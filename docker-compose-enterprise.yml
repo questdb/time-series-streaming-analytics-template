@@ -1,3 +1,36 @@
+# Common environment variables
+x-kafka-connect-env: &kafka-connect-env
+  CONNECT_BOOTSTRAP_SERVERS: 'broker:29092'
+  CONNECT_GROUP_ID: compose-connect-group
+  CONNECT_OFFSET_FLUSH_INTERVAL_MS: 500
+  CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+  CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+  CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+  CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+  CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+  CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+  CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+  CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+  CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+  # CLASSPATH required due to CC-2422
+  CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-7.5.3-0.jar
+  CONNECT_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
+  CONNECT_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
+  CONNECT_PLUGIN_PATH: "/usr/share/java,/etc/kafka-connect/jars,/usr/share/confluent-hub-components"
+  QUESTDB_HTTP_ENDPOINT: "${QUESTDB_HTTP_ENDPOINT:-host.docker.internal:9000}"
+  QUESTDB_REST_TOKEN: "${QUESTDB_REST_TOKEN:-}"
+
+# Common configuration (volumes, depends_on, etc.)
+x-kafka-connect-common: &kafka-connect-common
+  image: confluentinc/cp-kafka-connect:7.7.0
+  depends_on:
+    - broker
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  volumes:
+    - ./kafka-connect-plugins:/etc/kafka-connect/jars
+
+
 services:
   grafana:
     image: grafana/grafana-oss:11.2.0
@@ -90,39 +123,16 @@ services:
       SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: '*'
       SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: 'GET,POST,PUT,OPTIONS'
 
-  kafka-connect:
-    image: confluentinc/cp-kafka-connect:7.7.0
+  kafka-connect-1:
+    <<: *kafka-connect-common
     hostname: kafka-connect
     container_name: rta_kafka_connect
-    depends_on:
-      - broker
     ports:
       - "8083:8083"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    volumes:
-      - ./kafka-connect-plugins:/etc/kafka-connect/jars # Mount local directory for plugins
     environment:
-      CONNECT_BOOTSTRAP_SERVERS: 'broker:29092'
-      CONNECT_REST_ADVERTISED_HOST_NAME: connect
-      CONNECT_GROUP_ID: compose-connect-group
-      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
-      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
-      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
-      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
-      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
-      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
-      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
-      # CLASSPATH required due to CC-2422
-      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-7.5.3-0.jar
-      CONNECT_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
-      CONNECT_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
-      CONNECT_PLUGIN_PATH: "/usr/share/java,/etc/kafka-connect/jars,/usr/share/confluent-hub-components"
-      QUESTDB_HTTP_ENDPOINT: "${QUESTDB_HTTP_ENDPOINT:-host.docker.internal:9000}"
-      QUESTDB_REST_TOKEN: "${QUESTDB_REST_TOKEN:-}"
+      <<: *kafka-connect-env
+      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect
+      CONNECT_LISTENERS: http://0.0.0.0:8083
     command:
     - bash
     - -c
@@ -144,7 +154,8 @@ services:
       echo -e "\n--\n+> Registering QuestDB Connector"
 
       curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/questdb-iot/config -d '{
-      "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
+          "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
+          "tasks.max": "4",
           "topics": "iot_data",
           "client.conf.string": "http::addr=${QUESTDB_HTTP_ENDPOINT:-host.docker.internal:9000};token=${QUESTDB_REST_TOKEN:-};tls_verify=unsafe_off;auto_flush_interval=500;",
           "name": "questdb-iot",
@@ -157,7 +168,8 @@ services:
       }'
 
       curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/questdb-github/config -d '{
-      "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
+          "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
+          "tasks.max": "4",
           "topics": "github_events",
           "client.conf.string": "http::addr=${QUESTDB_HTTP_ENDPOINT:-host.docker.internal:9000};token=${QUESTDB_REST_TOKEN:-};tls_verify=unsafe_off;auto_flush_interval=500;",
           "name": "questdb-github",
@@ -171,7 +183,8 @@ services:
       }'
 
       curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/questdb-trades/config -d '{
-      "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
+          "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
+          "tasks.max": "4",
           "topics": "trades",
           "client.conf.string": "http::addr=${QUESTDB_HTTP_ENDPOINT:-host.docker.internal:9000};token=${QUESTDB_REST_TOKEN:-};tls_verify=unsafe_off;auto_flush_interval=500;",
           "name": "questdb-trades",
@@ -187,7 +200,8 @@ services:
       }'
 
       curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/questdb-smart-meters/config -d '{
-      "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
+          "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
+          "tasks.max": "4",
           "topics": "smart-meters",
           "client.conf.string": "http::addr=${QUESTDB_HTTP_ENDPOINT:-host.docker.internal:9000};token=${QUESTDB_REST_TOKEN:-};tls_verify=unsafe_off;auto_flush_interval=500;",
           "name": "questdb-smart-meters",
@@ -204,6 +218,16 @@ services:
 
       sleep infinity
 
+  kafka-connect-2:
+    <<: *kafka-connect-common
+    hostname: kafka-connect-2
+    container_name: rta_kafka_connect_2
+    ports:
+      - "8084:8084"
+    environment:
+      <<: *kafka-connect-env
+      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect-2
+      CONNECT_LISTENERS: http://0.0.0.0:8084
 
 
 
