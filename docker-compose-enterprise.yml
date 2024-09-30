@@ -1,14 +1,41 @@
+# Common kafka broker environment variables
+x-kafka-broker-env: &kafka-broker-env
+  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+  KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+  KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+  KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+  KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
+  KAFKA_JMX_HOSTNAME: localhost
+  KAFKA_PROCESS_ROLES: 'broker,controller'
+  KAFKA_CONTROLLER_QUORUM_VOTERS: '1@broker:29093,2@broker-2:29093'
+  KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+  KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+  KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+  KAFKA_METADATA_LOG_DIR: /tmp/kraft-metadata-logs
+  # Replace CLUSTER_ID with a unique base64 UUID using "bin/kafka-storage.sh random-uuid"
+  # See https://docs.confluent.io/kafka/operations-tools/kafka-tools.html#kafka-storage-sh
+  CLUSTER_ID: 'QTkwRDkzMDg3QTdFNDJCRU'
+
+
+# Common kafka broker configuration
+x-kafka-broker-common: &kafka-broker-common
+  image: confluentinc/cp-kafka:7.7.0
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  volumes:
+    - ./monitoring/kafka-agent:/usr/jolokia/agents:ro   #Jolokia agent for MX monitoring metrics
+
 # Common environment variables
 x-kafka-connect-env: &kafka-connect-env
-  CONNECT_BOOTSTRAP_SERVERS: 'broker:29092'
+  CONNECT_BOOTSTRAP_SERVERS: 'broker:29092,broker-2:29092'
   CONNECT_GROUP_ID: compose-connect-group
   CONNECT_OFFSET_FLUSH_INTERVAL_MS: 500
   CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
-  CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+  CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 2
   CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
-  CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+  CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 2
   CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
-  CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+  CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 2
   CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
   CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
   CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
@@ -24,7 +51,8 @@ x-kafka-connect-env: &kafka-connect-env
 x-kafka-connect-common: &kafka-connect-common
   image: confluentinc/cp-kafka-connect:7.7.0
   depends_on:
-    - broker
+    - broker-1
+    - broker-2
   extra_hosts:
     - "host.docker.internal:host-gateway"
   volumes:
@@ -74,8 +102,8 @@ services:
       - QDB_CLIENT_USER=${QDB_CLIENT_USER:-admin}
       - QDB_CLIENT_PASSWORD=${QDB_CLIENT_PASSWORD:-quest}
 
-  broker:
-    image: confluentinc/cp-kafka:7.7.0
+  broker-1:
+    <<: *kafka-broker-common
     hostname: broker
     container_name: rta_kafka_broker
     ports:
@@ -87,39 +115,47 @@ services:
     volumes:
       - ./monitoring/kafka-agent:/usr/jolokia/agents:ro   #Jolokia agent for MX monitoring metrics
     environment:
-      KAFKA_OPTS: -javaagent:/usr/jolokia/agents/jolokia-jvm-1.7.2.jar=host=0.0.0.0    #Jolokia agent for MX monitoring metrics
+      <<: *kafka-broker-env
       KAFKA_NODE_ID: 1
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
       KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092'
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_JMX_PORT: 9101
-      KAFKA_JMX_HOSTNAME: localhost
-      KAFKA_PROCESS_ROLES: 'broker,controller'
-      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@broker:29093'
       KAFKA_LISTENERS: 'PLAINTEXT://broker:29092,CONTROLLER://broker:29093,PLAINTEXT_HOST://0.0.0.0:9092'
-      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
-      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
-      KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
-      # Replace CLUSTER_ID with a unique base64 UUID using "bin/kafka-storage.sh random-uuid"
-      # See https://docs.confluent.io/kafka/operations-tools/kafka-tools.html#kafka-storage-sh
-      CLUSTER_ID: 'QTkwRDkzMDg3QTdFNDJCRU'
+      KAFKA_OPTS: -javaagent:/usr/jolokia/agents/jolokia-jvm-1.7.2.jar=port=8778,host=0.0.0.0    #Jolokia agent for MX monitoring metrics
+
+  broker-2:
+    <<: *kafka-broker-common
+    hostname: broker-2
+    container_name: rta_kafka_broker_2
+    ports:
+      - "9093:9093"
+      - "9102:9102"
+      - "8779:8779"   #Jolokia agent for MX monitoring metrics
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./monitoring/kafka-agent:/usr/jolokia/agents:ro   #Jolokia agent for MX monitoring metrics
+    environment:
+      <<: *kafka-broker-env
+      KAFKA_NODE_ID: 2
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker-2:29092,PLAINTEXT_HOST://localhost:9093'
+      KAFKA_JMX_PORT: 9102
+      KAFKA_LISTENERS: 'PLAINTEXT://broker-2:29092,CONTROLLER://broker-2:29093,PLAINTEXT_HOST://0.0.0.0:9093'
+      KAFKA_OPTS: -javaagent:/usr/jolokia/agents/jolokia-jvm-1.7.2.jar=port=8779,host=0.0.0.0  #Jolokia agent for MX monitoring metrics
 
   schema_registry:
     image: confluentinc/cp-schema-registry:7.7.0
     hostname: schema_registry
     container_name: rta_schema_registry
     depends_on:
-      - broker
+      - broker-1
+      - broker-2
     ports:
       - "8081:8081"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schema_registry
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: broker:29092
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'broker:29092,broker-2:29092'
       SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: '*'
       SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: 'GET,POST,PUT,OPTIONS'
 
@@ -155,7 +191,7 @@ services:
 
       curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/questdb-iot/config -d '{
           "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
-          "tasks.max": "4",
+          "tasks.max": "5",
           "topics": "iot_data",
           "client.conf.string": "https::addr=${QUESTDB_HTTP_ENDPOINT:-host.docker.internal:9000};token=${QUESTDB_REST_TOKEN:-};tls_verify=unsafe_off;auto_flush_interval=500;",
           "name": "questdb-iot",
@@ -169,7 +205,7 @@ services:
 
       curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/questdb-github/config -d '{
           "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
-          "tasks.max": "4",
+          "tasks.max": "5",
           "topics": "github_events",
           "client.conf.string": "https::addr=${QUESTDB_HTTP_ENDPOINT:-host.docker.internal:9000};token=${QUESTDB_REST_TOKEN:-};tls_verify=unsafe_off;auto_flush_interval=500;",
           "name": "questdb-github",
@@ -184,7 +220,7 @@ services:
 
       curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/questdb-trades/config -d '{
           "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
-          "tasks.max": "4",
+          "tasks.max": "5",
           "topics": "trades",
           "client.conf.string": "https::addr=${QUESTDB_HTTP_ENDPOINT:-host.docker.internal:9000};token=${QUESTDB_REST_TOKEN:-};tls_verify=unsafe_off;auto_flush_interval=500;",
           "name": "questdb-trades",
@@ -201,7 +237,7 @@ services:
 
       curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/questdb-smart-meters/config -d '{
           "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
-          "tasks.max": "4",
+          "tasks.max": "5",
           "topics": "smart-meters",
           "client.conf.string": "https::addr=${QUESTDB_HTTP_ENDPOINT:-host.docker.internal:9000};token=${QUESTDB_REST_TOKEN:-};tls_verify=unsafe_off;auto_flush_interval=500;",
           "name": "questdb-smart-meters",
