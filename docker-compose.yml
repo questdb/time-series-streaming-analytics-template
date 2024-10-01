@@ -43,8 +43,11 @@ x-kafka-connect-env: &kafka-connect-env
   CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-7.5.3-0.jar
   CONNECT_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
   CONNECT_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
+  CONNECT_ERRORS_RETRY_TIMEOUT: 90000
+  CONNECT_ERRORS_RETRY_DELAY_MAX_MS: 120000
   CONNECT_PLUGIN_PATH: "/usr/share/java,/etc/kafka-connect/jars,/usr/share/confluent-hub-components"
   QUESTDB_HTTP_ENDPOINT: "${QUESTDB_HTTP_ENDPOINT:-host.docker.internal:9000}"
+
 
 # Common kafka connect configuration
 x-kafka-connect-common: &kafka-connect-common
