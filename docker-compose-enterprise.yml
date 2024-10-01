@@ -6,6 +6,7 @@ x-kafka-broker-env: &kafka-broker-env
   KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
   KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
   KAFKA_JMX_HOSTNAME: localhost
+  KAFKA_ENABLE_KRAFT: yes
   KAFKA_PROCESS_ROLES: 'broker,controller'
   KAFKA_CONTROLLER_QUORUM_VOTERS: '1@broker:29093,2@broker-2:29093'
   KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
@@ -22,8 +23,6 @@ x-kafka-broker-common: &kafka-broker-common
   image: confluentinc/cp-kafka:7.7.0
   extra_hosts:
     - "host.docker.internal:host-gateway"
-  volumes:
-    - ./monitoring/kafka-agent:/usr/jolokia/agents:ro   #Jolokia agent for MX monitoring metrics
 
 # Common environment variables
 x-kafka-connect-env: &kafka-connect-env
@@ -114,6 +113,9 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - ./monitoring/kafka-agent:/usr/jolokia/agents:ro   #Jolokia agent for MX monitoring metrics
+      - ./broker-1/kafka-data:/var/lib/kafka/data
+      - ./broker-1/kafka-secrets:/etc/kafka/secrets
+      - ./broker-1/tmp:/tmp
     environment:
       <<: *kafka-broker-env
       KAFKA_NODE_ID: 1
@@ -134,6 +136,9 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - ./monitoring/kafka-agent:/usr/jolokia/agents:ro   #Jolokia agent for MX monitoring metrics
+      - ./broker-2/kafka-data:/var/lib/kafka/data
+      - ./broker-2/kafka-secrets:/etc/kafka/secrets
+      - ./broker-2/tmp:/tmp
     environment:
       <<: *kafka-broker-env
       KAFKA_NODE_ID: 2

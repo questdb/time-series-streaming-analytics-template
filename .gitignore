@@ -9,6 +9,8 @@ questdb/questdb_root/*
 
 # Jupyter notebook
 
+broker-1
+broker-2
 notebooks/.bash_history
 .cache/*
 notebooks/.jupyter/*
