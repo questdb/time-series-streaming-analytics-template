@@ -9,8 +9,19 @@ questdb/questdb_root/*
 
 # Jupyter notebook
 
-broker-1
-broker-2
+broker-1/kafka-data/*
+!broker-1/kafka-data/.gitkeep
+broker-1/kafka-secrets/*
+!broker-1/kafka-secrets/.gitkeep
+broker-1/tmp/*
+!broker-1/tmp/.gitkeep
+broker-2/kafka-data/*
+!broker-2/kafka-data/.gitkeep
+broker-2/kafka-secrets/*
+!broker-2/kafka-secrets/.gitkeep
+broker-2/tmp/*
+!broker-2/tmp/.gitkeep
+
 notebooks/.bash_history
 .cache/*
 notebooks/.jupyter/*
