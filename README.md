@@ -13,7 +13,9 @@ The dataset with most examples available in this project is the trading dataset,
 
 All the components can be started with a single `docker-compose` command, or can be deployed independently.
 
-_Note_: All the components use the bare minimum configuration needed to run this template. Make sure you double check the configuration and adjust accordingly if you are planning to run this in production.
+_Note_: Even if the template starts multiple instances of brokers and workers for higher availability, all the components
+use the bare minimum configuration needed to run this template. Make sure you double check the configuration and adjust
+accordingly if you are planning to run this in production.
 
 ## Pre-requisites
 
