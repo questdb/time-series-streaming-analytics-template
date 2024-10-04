@@ -6,7 +6,8 @@ The project sends events to a message broker (Apache Kafka), persists them into 
 
 The template includes workflows to capture, process and analyze crypto currency trading data, public GitHub repositories data, and (simulated) smart meters and IoT data.
 
-![github events dashboard](github_events_dashboard_screenshot.png)
+![trading data dashboard](trading_data_dashboard_screenshot.png)
+
 
 The dataset with most examples available in this project is the trading dataset, which contains real crypto currency trades observed between March 1st and March 12th 2024.
 
@@ -167,6 +168,8 @@ you can just paste it where it says `<YOUR_GITHUB_TOKEN>`.
 The data you send to Kafka will be passed to QuestDB, where it will be stored into a table named `github_events`. We will explore the database later.
 
 For now, you can navigate to the live dashboard at [http://localhost:3000/d/github-events-questdb/github-events-dashboard?orgId=1&refresh=5s](http://localhost:3000/d/github-events-questdb/github-events-dashboard?orgId=1&refresh=5s). User is `admin` and password `quest`.
+
+![github events dashboard](github_events_dashboard_screenshot.png)
 
 You should see how data gets updated. The dashboard auto refreshes every 5 seconds, but data is only collected every 10 seconds, so it will take ~10 seconds to see new results on the charts. For the first few minutes some of the charts might look a bit empty, but after enough data is collected it should look better.
 
