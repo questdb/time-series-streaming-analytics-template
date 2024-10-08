@@ -89,13 +89,16 @@ graph TD
     AK -->|trades topic| KSR[Kafka Schema Registry]
     AK -->|smart-meters topic| KC
     AK -->|smart-meters topic| KSR[Kafka Schema Registry]
+    AK -->|transactions topic| KC
+    AK -->|transactions topic| KSR[Kafka Schema Registry]
     KC[Kafka Connect] -->|into github_events table| Q[QuestDB]
     KC[Kafka Connect] -->|into trades table| Q[QuestDB]
     KC[Kafka Connect] -->|into smart_meters table| Q[QuestDB]
+    KC[Kafka Connect] -->|into transactions table| Q[QuestDB]
   end
 
   subgraph "Real-time dashboards"
-    Q -->|SELECT FROM trades, github_events, smart_meters and iot_data tables| G[Grafana]
+    Q -->|SELECT FROM trades, github_events, smart_meters, transactions, and iot_data tables| G[Grafana]
   end
 
 
@@ -202,7 +205,7 @@ named `trades`.
 We can also consume events from that topic by running:
 `docker exec -ti rta_kafka_broker kafka-console-consumer --bootstrap-server localhost:9092 --topic trades`.
 
-You will notice the output is very weird. When you are running any of the examples (trades or smart_meters) that use
+You will notice the output is very weird. When you are running any of the examples (trades, smart_meters, or transactions) that use
 AVRO instead of JSON, the output will be in AVRO binary format. To check output of AVRO topics in kafka we provide a
 python script under `ingestion/python`. The
 script reads data from Kafka and then deserializes to a text format. You can execute using docker via:

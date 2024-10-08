@@ -259,6 +259,23 @@ services:
           "value.converter.schemas.enable": true
       }'
 
+      curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/questdb-transactions/config -d '{
+          "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
+          "tasks.max": "5",
+          "topics": "transactions",
+          "client.conf.string": "http::addr=${QUESTDB_HTTP_ENDPOINT:-host.docker.internal:9000};",
+          "name": "questdb-transactions",
+          "value.converter": "io.confluent.connect.avro.AvroConverter",
+          "value.converter.schema.registry.url": "http://schema_registry:8081",
+          "include.key": false,
+          "key.converter": "io.confluent.connect.avro.AvroConverter",
+          "key.converter.schema.registry.url": "http://schema_registry:8081",
+          "table": "transactions",
+          "symbols": "merchant, category, gender, city, state",
+          "timestamp.field.name": "timestamp",
+          "value.converter.schemas.enable": true
+      }'
+
       sleep infinity
 
   kafka-connect-2:
