@@ -263,7 +263,7 @@ services:
           "connector.class": "io.questdb.kafka.QuestDBSinkConnector",
           "tasks.max": "5",
           "topics": "transactions",
-          "client.conf.string": "http::addr=${QUESTDB_HTTP_ENDPOINT:-host.docker.internal:9000};",
+          "client.conf.string": "http::addr=${QUESTDB_HTTP_ENDPOINT:-host.docker.internal:9000};token=${QUESTDB_REST_TOKEN:-};tls_verify=unsafe_off;auto_flush_interval=500;",
           "name": "questdb-transactions",
           "value.converter": "io.confluent.connect.avro.AvroConverter",
           "value.converter.schema.registry.url": "http://schema_registry:8081",
