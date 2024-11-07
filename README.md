@@ -4,7 +4,7 @@ This repository can be used as a template for near real-time analytics using ope
 
 The project sends events to a message broker (Apache Kafka), persists them into a fast time-series database ([QuestDB](https://questdb.io)), and visualizes them on a dashboard (Grafana). It also provides a web-based development environment (Jupyter Notebook) for data science and machine learning, and monitoring metrics are captured by a server agent (telegraf) and stored into the time-series database (QuestDB).
 
-The template includes workflows to capture, process and analyze crypto currency trading data, public GitHub repositories data, and (simulated) smart meters and IoT data.
+The template includes workflows to capture, process and analyze crypto currency trading data, public GitHub repositories data, and (simulated) smart meters, factory plant sensors, and IoT data.
 
 ![trading data dashboard](trading_data_dashboard_screenshot.png)
 
@@ -85,6 +85,7 @@ graph TD
     AK -->|github_events topic| KC
     IE[IoT Events] -->|ILP Protocol into iot_data table| Q
     IE[Trading Events] -->|ILP Protocol into trades table| Q
+    PS[Plant Sensors] -->|ILP Protocol into plant_sensors table| Q
     AK -->|trades topic| KC
     AK -->|trades topic| KSR[Kafka Schema Registry]
     AK -->|smart-meters topic| KC
@@ -98,7 +99,7 @@ graph TD
   end
 
   subgraph "Real-time dashboards"
-    Q -->|SELECT FROM trades, github_events, smart_meters, transactions, and iot_data tables| G[Grafana]
+    Q -->|SELECT FROM trades, github_events, smart_meters, transactions, plant_sensors, and iot_data tables| G[Grafana]
   end
 
 
