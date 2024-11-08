@@ -1,0 +1,610 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Sending synthetic data from sensors",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 7,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 11,
+      "panels": [],
+      "title": "Measure1 and Measure2 samples",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "default": true,
+        "type": "questdb-questdb-datasource",
+        "uid": "P0F15568B0DD880D0"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "always",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 9,
+        "x": 0,
+        "y": 1
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "qdb",
+          "format": 1,
+          "group": [],
+          "metricColumn": "measure1",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  timestamp AS \"time\", address,\n  avg(value) AS metric,  \nFROM plant_sensors\nWHERE value is not null and \n  $__timeFilter(timestamp)\nsample by 30s \nORDER BY 1,2",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "duration_ms"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "avg"
+                ],
+                "type": "aggregate"
+              },
+              {
+                "params": [
+                  "duration_ms"
+                ],
+                "type": "alias"
+              }
+            ]
+          ],
+          "selectedFormat": 2,
+          "table": "iot_data",
+          "timeColumn": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Measures sampled by 30 seconds",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "default": true,
+        "type": "questdb-questdb-datasource",
+        "uid": "P0F15568B0DD880D0"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "points",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "always",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 9,
+        "x": 9,
+        "y": 1
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "qdb",
+          "format": 1,
+          "group": [],
+          "metricColumn": "measure1",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  timestamp AS \"time\", address,\n  avg(value) AS metric\nFROM plant_sensors\nWHERE value is not null and \n  $__timeFilter(timestamp)\nsample by 1m \nORDER BY 1,2",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "duration_ms"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "avg"
+                ],
+                "type": "aggregate"
+              },
+              {
+                "params": [
+                  "duration_ms"
+                ],
+                "type": "alias"
+              }
+            ]
+          ],
+          "selectedFormat": 2,
+          "table": "iot_data",
+          "timeColumn": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Measures sampled by minute, stacked",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 11
+      },
+      "id": 9,
+      "panels": [],
+      "title": "Speed and location",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "default": true,
+        "type": "questdb-questdb-datasource",
+        "uid": "P0F15568B0DD880D0"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 18,
+        "x": 0,
+        "y": 12
+      },
+      "id": 6,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.2.0",
+      "targets": [
+        {
+          "datasource": "qdb",
+          "format": 1,
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  system,\n  avg(value) as avg_value\nFROM plant_sensors\nWHERE value is not null and \n  $__timeFilter(timestamp)\nORDER BY 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "selectedFormat": 2,
+          "table": "iot_data",
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Average Speeds",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "default": true,
+        "type": "questdb-questdb-datasource",
+        "uid": "P0F15568B0DD880D0"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 14,
+        "x": 0,
+        "y": 18
+      },
+      "id": 12,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.2.0",
+      "targets": [
+        {
+          "datasource": "qdb",
+          "format": 1,
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "  select system, avg(value) from plant_sensors \n  WHERE value is not null and \n  $__timeFilter(timestamp)\n\n",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "selectedFormat": 2,
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Mean values",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "default": true,
+        "type": "questdb-questdb-datasource",
+        "uid": "P0F15568B0DD880D0"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 14,
+        "y": 18
+      },
+      "id": 14,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.2.0",
+      "targets": [
+        {
+          "datasource": "qdb",
+          "format": 1,
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH in_interval AS (\nSELECT count(*) as total_in_interval\nFROM plant_sensors\nWHERE\n  $__timeFilter(timestamp)\n  ), absolute_total AS (\n  SELECT count(*) as total_seen\nFROM plant_sensors\n  )\n  select * from in_interval cross join absolute_total\n  \n",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "selectedFormat": 2,
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Number of data points received",
+      "type": "stat"
+    }
+  ],
+  "refresh": "500s",
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "100ms",
+      "500ms",
+      "1s",
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "",
+  "title": "Factory Sensors - QuestDB Demo",
+  "uid": "ce3bs9vfe603ka",
+  "version": 3,
+  "weekStart": ""
+}
