@@ -81,7 +81,7 @@ graph TD
 
 
   subgraph "Data Ingestion"
-    GE[GitHub Events] -->|Python, NodeJS, Java, Go, Rust into github_events topic | AK[Apache Kafka]
+    GE[Trading Events, GitHub Events, Smart Meters, Transactions] -->|Python, NodeJS, Java, Go, Rust into topics | AK[Apache Kafka]
     AK -->|github_events topic| KC
     IE[IoT Events] -->|ILP Protocol into iot_data table| Q
     IE[Trading Events] -->|ILP Protocol into trades table| Q
