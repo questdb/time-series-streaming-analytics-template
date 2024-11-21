@@ -419,7 +419,7 @@
           "editorMode": "code",
           "format": 0,
           "rawQuery": true,
-          "rawSql": "SELECT timestamp time, symbol,\n  case when side ='buy' then amount*price \n  else -1*amount*price end trade \nfrom trades where $__timeFilter(timestamp) and \nsymbol like '%-USD'",
+          "rawSql": "SELECT timestamp time, symbol,\n  AVG(case when side ='buy' then amount*price \n  else -1*amount*price end) trade \nfrom trades where $__timeFilter(timestamp) and \nsymbol like '%-USD' SAMPLE BY 250T",
           "refId": "A",
           "selectedFormat": 0,
           "sql": {
