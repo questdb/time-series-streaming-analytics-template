@@ -88,6 +88,7 @@ services:
     volumes:
       - ./notebooks:/home/jovyan:rw
       - ./ingestion/python:/home/ingestion:rw
+      - ${QUESTDB_DB_FOLDER:-/var/tmp}:/db:ro
     ports:
       - 8888:8888
     command: sh -c "pip install questdb psycopg[binary] psycopg2-binary PyGithub kafka-python confluent-kafka \"confluent-kafka[avro]\" fastavro requests && start-notebook.sh --NotebookApp.password= --NotebookApp.token="
@@ -291,4 +292,20 @@ services:
       CONNECT_LISTENERS: http://0.0.0.0:8084
 
 
+
+        #  telegraf:
+        #    image: telegraf
+        #    container_name: rta_telegraf
+        #    depends_on:
+        #      - broker-1
+        #      - broker-2
+        #    volumes:
+        #      - ./monitoring/telegraf/kafka_and_questdb_telegraf.conf:/etc/telegraf/telegraf.conf:ro
+        #    extra_hosts:
+        #      - "host.docker.internal:host-gateway"
+        #    environment:
+        #      - QUESTDB_METRICS_URL=${QUESTDB_METRICS_URL:-https://172.31.42.41:9003}
+        #      - QUESTDB_HTTP_URL=${QUESTDB_HTTP_URL:-https://172.31.42.41:9000}
+        #      - QUESTDB_HTTP_TOKEN=${QUESTDB_HTTP_TOKEN:-qt1H8Mi_vPUpt_R7ByDdJ7_kRIiieNb_BFKdjBDqxp6wh8}
+        #      - QUESTDB_SKIP_TLS_VERIFICATION=${QUESTDB_SKIP_TLS_VERIFICATION:-true}
 

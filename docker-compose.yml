@@ -63,7 +63,7 @@ x-kafka-connect-common: &kafka-connect-common
 
 services:
   questdb:
-    image: questdb/questdb:8.1.1
+    image: questdb/questdb:8.2.1
     container_name: rta_questdb
     restart: always
     ports:
