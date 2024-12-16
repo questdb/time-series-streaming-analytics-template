@@ -88,7 +88,7 @@ services:
     volumes:
       - ./notebooks:/home/jovyan:rw
       - ./ingestion/python:/home/ingestion:rw
-      - ${QUESTDB_DB_FOLDER:-/var/tmp}:/db:ro
+      - ${QUESTDB_ROOT:-/var/tmp}:/db_root:ro
     ports:
       - 8888:8888
     command: sh -c "pip install questdb psycopg[binary] psycopg2-binary PyGithub kafka-python confluent-kafka \"confluent-kafka[avro]\" fastavro requests && start-notebook.sh --NotebookApp.password= --NotebookApp.token="
