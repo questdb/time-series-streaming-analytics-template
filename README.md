@@ -204,7 +204,7 @@ If you run the Jupyter Notebook `Send-Trades-To-Kafka.ipynb`, the output of this
 named `trades`.
 
 We can also consume events from that topic by running:
-`docker exec -ti rta_kafka_broker kafka-console-consumer --bootstrap-server localhost:9092 --topic trades`.
+`docker exec -ti rta_kafka_broker kafka-console-consumer --bootstrap-server rta_kafka_broker:29092 --topic trades --from-beginning`.
 
 You will notice the output is very weird. When you are running any of the examples (trades, smart_meters, or transactions) that use
 AVRO instead of JSON, the output will be in AVRO binary format. To check output of AVRO topics in kafka we provide a
@@ -212,7 +212,7 @@ python script under `ingestion/python`. The
 script reads data from Kafka and then deserializes to a text format. You can execute using docker via:
 
 ```shell
-docker exec -it rta_jupyter python /home/ingestion/kafka_avro_reader.py --topic smart-trades --broker rta_kafka_broker:29092 --schema-registry http://rta_schema_registry:8081
+docker exec -it rta_jupyter python /home/ingestion/kafka_avro_reader.py --topic trades --broker rta_kafka_broker:29092 --schema-registry http://rta_schema_registry:8081
 ```
 
 If you have been sending data using the GitHub dataset, you can just use the regular `kafka-console-consumer` as the
