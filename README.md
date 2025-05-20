@@ -83,15 +83,15 @@ graph TD
   subgraph "Data Ingestion"
     GE[Trading Events, GitHub Events, Smart Meters, Transactions] -->|Python, NodeJS, Java, Go, Rust into topics | AK[Apache Kafka]
     AK -->|github_events topic| KC
-    IE[IoT Events] -->|ILP Protocol into iot_data table| Q
+    IO[IoT Events] -->|ILP Protocol into iot_data table| Q
     IE[Trading Events] -->|ILP Protocol into trades table| Q
     PS[Plant Sensors] -->|ILP Protocol into plant_sensors table| Q
     AK -->|trades topic| KC
     AK -->|trades topic| KSR[Kafka Schema Registry]
     AK -->|smart-meters topic| KC
-    AK -->|smart-meters topic| KSR[Kafka Schema Registry]
+    AK -->|smart-meters topic| KSR
     AK -->|transactions topic| KC
-    AK -->|transactions topic| KSR[Kafka Schema Registry]
+    AK -->|transactions topic| KSR
     KC[Kafka Connect] -->|into github_events table| Q[QuestDB]
     KC[Kafka Connect] -->|into trades table| Q[QuestDB]
     KC[Kafka Connect] -->|into smart_meters table| Q[QuestDB]
